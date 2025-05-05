@@ -1,7 +1,7 @@
 CREATE DATABASE GatosDB;
-
 USE GatosDB;
 
+-- Tabla Usuario actualizada
 CREATE TABLE Usuario (
     Id_Usuario INT IDENTITY(1,1) PRIMARY KEY,
     Nombre VARCHAR(100) NOT NULL,
@@ -9,16 +9,16 @@ CREATE TABLE Usuario (
     Contraseña VARCHAR(100) NOT NULL,
     Email VARCHAR(100) NOT NULL UNIQUE,
     Fecha_Registro DATETIME NOT NULL,
+    Rol VARCHAR(20) NOT NULL DEFAULT 'usuario', -- 'usuario', 'admin', 'protectora'
+    Activo BIT NOT NULL DEFAULT 1
 );
 
-INSERT INTO Usuario (Nombre, Apellido, Contraseña, Email, Fecha_Registro)
+INSERT INTO Usuario (Nombre, Apellido, Contraseña, Email, Fecha_Registro, Rol, Activo)
 VALUES 
-('Juan', 'Juanez', 'juan123', 'juanjuan@gmail.com', SYSDATETIME()),
-('Fran', 'Franez', 'fran123', 'franfran@gmail.com', SYSDATETIME());
+('Juan', 'Juanez', 'juan123', 'juanjuan@gmail.com', SYSDATETIME(), 'admin', 1),
+('Fran', 'Franez', 'fran123', 'franfran@gmail.com', SYSDATETIME(), 'protectora', 1);
 
-SELECT * FROM Usuario;
-
-
+-- Tabla Protectora con relación a Usuario
 CREATE TABLE Protectora (
     Id_Protectora INT IDENTITY(1,1) PRIMARY KEY,
     Nombre_Protectora VARCHAR(100) NOT NULL,
@@ -27,16 +27,16 @@ CREATE TABLE Protectora (
     Telefono_Protectora VARCHAR(15) NOT NULL,
     Pagina_Web VARCHAR(100) NOT NULL,
     Imagen_Protectora VARCHAR(100) NOT NULL,
+    Id_Usuario INT NOT NULL,
+    FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id_Usuario)
 );
 
-INSERT INTO Protectora (Nombre_Protectora, Direccion, Correo_Protectora, Telefono_Protectora, Pagina_Web, Imagen_Protectora)
+INSERT INTO Protectora (Nombre_Protectora, Direccion, Correo_Protectora, Telefono_Protectora, Pagina_Web, Imagen_Protectora, Id_Usuario)
 VALUES 
-('Bigotes Callejeros', 'El Picarral', 'Bigotescallejeros@gmail.com', '123456789', 'https://bigotescallejeros.wordpress.com/', '/Images/protectoras/BigotesCallejeros.png'),
-('Adala', 'Casco antiguo', 'adala@gmail.com', '14141414', 'www.adalazaragoza.com', '/Images/protectoras/Adala.png');
+('Bigotes Callejeros', 'El Picarral', 'Bigotescallejeros@gmail.com', '123456789', 'https://bigotescallejeros.wordpress.com/', '/Images/protectoras/BigotesCallejeros.png', 2),
+('Adala', 'Casco antiguo', 'adala@gmail.com', '14141414', 'www.adalazaragoza.com', '/Images/protectoras/Adala.png', 2);
 
-SELECT * FROM Protectora;
-
-
+-- Tabla Gato con campo Visible
 CREATE TABLE Gato (
     Id_Gato INT IDENTITY(1,1) PRIMARY KEY,
     Id_Protectora INT NOT NULL,
@@ -47,6 +47,7 @@ CREATE TABLE Gato (
     Sexo VARCHAR(10) NOT NULL,
     Descripcion_Gato VARCHAR(1000) NOT NULL,
     Imagen_Gato VARCHAR(100),
+    Visible BIT NOT NULL DEFAULT 1,
     FOREIGN KEY (Id_Protectora) REFERENCES Protectora(Id_Protectora)
 );
 
@@ -65,22 +66,34 @@ VALUES
 (1, 'Chloe', 'Blanco y pardo', 1, 1, 'Hembra', 'Necesita una adopción estable, alguien que realmente ame a los animales y tenga paciencia para respetar su espacio, y que poco a poco se vaya acercando.', '/Images/gatos/Chloe.png'),
 (1, 'Carter', 'Blanco y pardo', 1, 1, 'Macho', 'Es un cachorrito muy juguetón al que le encanta socializar y pasar el rato con todo el mundo.', '/Images/gatos/Carter.png');
 
-
-SELECT * FROM Gato;
-
-
+-- Tabla Deseados
 CREATE TABLE Deseados (
     Id_Deseado INT IDENTITY(1,1) PRIMARY KEY,
     Id_Usuario INT NOT NULL,
     Id_Gato INT NOT NULL,
     Fecha_Deseado DATETIME NOT NULL,
     FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id_Usuario) ON DELETE CASCADE,
-    FOREIGN KEY (Id_Gato) REFERENCES Gato(Id_Gato) ON DELETE CASCADE,
+    FOREIGN KEY (Id_Gato) REFERENCES Gato(Id_Gato) ON DELETE CASCADE
 );
 
 INSERT INTO Deseados (Id_Usuario, Id_Gato, Fecha_Deseado)
 VALUES
 (1, 2, SYSDATETIME()),
-(1, 2, SYSDATETIME());
+(1, 1, SYSDATETIME());
 
-SELECT * FROM Deseados;
+-- Tabla SolicitudAdopcion con estado y comentario de protectora
+CREATE TABLE SolicitudAdopcion (
+    Id_Solicitud INT IDENTITY(1,1) PRIMARY KEY,
+    Id_Usuario INT NOT NULL,
+    Id_Gato INT NOT NULL,
+    Fecha_Solicitud DATETIME NOT NULL DEFAULT GETDATE(),
+    Estado VARCHAR(20) NOT NULL DEFAULT 'pendiente', -- pendiente, aceptada, rechazada
+    Comentario_Usuario VARCHAR(500),
+    Comentario_Protectora VARCHAR(1000),
+    FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id_Usuario),
+    FOREIGN KEY (Id_Gato) REFERENCES Gato(Id_Gato)
+);
+
+INSERT INTO SolicitudAdopcion (Id_Usuario, Id_Gato, Comentario_Usuario, Comentario_Protectora)
+VALUES
+(1, 2, 'Me gustaría adoptar a Widow porque me encantan los gatos tranquilos.', 'Gracias por tu interés, Widow necesita una familia tranquila.');
