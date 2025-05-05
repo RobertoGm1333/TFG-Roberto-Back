@@ -56,6 +56,8 @@ namespace ProtectoraAPI.Controllers
            existingGato.Sexo = updatedGato.Sexo;
            existingGato.Descripcion_Gato = updatedGato.Descripcion_Gato;
            existingGato.Imagen_Gato = updatedGato.Imagen_Gato;
+           existingGato.Id_Protectora = updatedGato.Id_Protectora;
+           existingGato.Visible = updatedGato.Visible;
 
            await _repository.UpdateAsync(existingGato);
            return NoContent();

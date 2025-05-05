@@ -11,10 +11,11 @@ public class Gato {
     public string Sexo {get; set;} = "";
     public string Descripcion_Gato {get; set;} = "";
     public string Imagen_Gato {get; set;} = "";
+    public bool Visible {get; set;} = true;
 
     public Gato() {}
 
-    public Gato(int id_Protectora, string nombre_Gato, string raza, int edad, bool esterilizado, string sexo, string descripcion_Gato, string imagen_Gato) {
+    public Gato(int id_Protectora, string nombre_Gato, string raza, int edad, bool esterilizado, string sexo, string descripcion_Gato, string imagen_Gato, bool visible) {
         Id_Protectora = id_Protectora;
         Nombre_Gato = nombre_Gato;
         Raza = raza;
@@ -23,6 +24,7 @@ public class Gato {
         Sexo = sexo;
         Descripcion_Gato = descripcion_Gato;
         Imagen_Gato = imagen_Gato;
+        Visible = visible;
     }
 
     public void MostrarDetalles() {

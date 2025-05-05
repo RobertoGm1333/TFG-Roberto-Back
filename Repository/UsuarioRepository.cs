@@ -34,7 +34,9 @@ namespace ProtectoraAPI.Repositories
                                 Apellido = reader.GetString(2),
                                 Contraseña = reader.GetString(3),
                                 Email = reader.GetString(4),
-                                Fecha_Registro = reader.GetDateTime(5)
+                                Fecha_Registro = reader.GetDateTime(5),
+                                Rol = reader.GetString(6),
+                                Activo = reader.GetBoolean(7)
                             };
 
                             usuarios.Add(usuario);
@@ -69,7 +71,9 @@ namespace ProtectoraAPI.Repositories
                                 Apellido = reader.GetString(2),
                                 Contraseña = reader.GetString(3),
                                 Email = reader.GetString(4),
-                                Fecha_Registro = reader.GetDateTime(5)
+                                Fecha_Registro = reader.GetDateTime(5),
+                                Rol = reader.GetString(6),
+                                Activo = reader.GetBoolean(7)
                             };
                         }
                     }
@@ -84,7 +88,7 @@ namespace ProtectoraAPI.Repositories
             {
                 await connection.OpenAsync();
 
-                string query = "INSERT INTO Usuario (Nombre, Apellido, Contraseña, Email, Fecha_Registro) VALUES (@Nombre, @Apellido, @Contraseña, @Email, @Fecha_Registro)";
+                string query = "INSERT INTO Usuario (Nombre, Apellido, Contraseña, Email, Fecha_Registro, Rol, Activo) VALUES (@Nombre, @Apellido, @Contraseña, @Email, @Fecha_Registro, @Rol, @Activo)";
                 using (var command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Nombre", usuario.Nombre);
@@ -92,6 +96,8 @@ namespace ProtectoraAPI.Repositories
                     command.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
                     command.Parameters.AddWithValue("@Email", usuario.Email);
                     command.Parameters.AddWithValue("@Fecha_Registro", usuario.Fecha_Registro);
+                    command.Parameters.AddWithValue("@Rol", usuario.Rol);
+                    command.Parameters.AddWithValue("@Activo", usuario.Activo);
 
                     await command.ExecuteNonQueryAsync();
                 }
@@ -114,9 +120,36 @@ namespace ProtectoraAPI.Repositories
             }
         }
 
-        public Task UpdateAsync(Usuario usuario)
+        public async Task UpdateAsync(Usuario usuario)
         {
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                string query = @"UPDATE Usuario SET 
+                                Nombre = @Nombre,
+                                Apellido = @Apellido,
+                                Contraseña = @Contraseña,
+                                Email = @Email,
+                                Fecha_Registro = @Fecha_Registro,
+                                Rol = @Rol,
+                                Activo = @Activo
+                                WHERE Id_Usuario = @Id";
+
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Nombre", usuario.Nombre);
+                    command.Parameters.AddWithValue("@Apellido", usuario.Apellido);
+                    command.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
+                    command.Parameters.AddWithValue("@Email", usuario.Email);
+                    command.Parameters.AddWithValue("@Fecha_Registro", usuario.Fecha_Registro);
+                    command.Parameters.AddWithValue("@Rol", usuario.Rol);
+                    command.Parameters.AddWithValue("@Activo", usuario.Activo);
+                    command.Parameters.AddWithValue("@Id", usuario.Id_Usuario);
+
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
         }
 
         public async Task<Usuario?> GetByEmailAndPasswordAsync(string email, string password)
@@ -141,16 +174,17 @@ namespace ProtectoraAPI.Repositories
                                 Id_Usuario = reader.GetInt32(0),
                                 Nombre = reader.GetString(1),
                                 Apellido = reader.GetString(2),
-                                Contraseña = reader.GetString(3), // OJO: Hay que compararla con Hash
+                                Contraseña = reader.GetString(3),
                                 Email = reader.GetString(4),
-                                Fecha_Registro = reader.GetDateTime(5)
+                                Fecha_Registro = reader.GetDateTime(5),
+                                Rol = reader.GetString(6),
+                                Activo = reader.GetBoolean(7)
                             };
                         }
                     }
                 }
             }
 
-            // Verificar contraseña (si está en texto plano, cambiar a bcrypt en el futuro)
             if (usuario != null && usuario.Contraseña == password)
             {
                 return usuario;

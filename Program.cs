@@ -18,6 +18,9 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>(provider =>
 builder.Services.AddScoped<IDeseadoRepository, DeseadoRepository>(provider =>
     new DeseadoRepository(connectionString));
 
+builder.Services.AddScoped<ISolicitudAdopcionRepository, SolicitudAdopcionRepository>(provider =>
+    new SolicitudAdopcionRepository(connectionString));
+
 // Servicios
 builder.Services.AddScoped<IGatoService, GatoService>(provider =>
     new GatoService(provider.GetRequiredService<IGatoRepository>()));
@@ -31,6 +34,9 @@ builder.Services.AddScoped<IUsuarioService, UsuarioService>(provider =>
 builder.Services.AddScoped<IDeseadoService, DeseadoService>(provider =>
     new DeseadoService(provider.GetRequiredService<IDeseadoRepository>()));
 
+builder.Services.AddScoped<ISolicitudAdopcionService, SolicitudAdopcionService>(provider =>
+    new SolicitudAdopcionService(provider.GetRequiredService<ISolicitudAdopcionRepository>()));
+
 var AllowAll = "_AllowAll";
 
 builder.Services.AddCors(options =>
@@ -38,7 +44,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "_AllowAll",
         policy =>
         {
-                  policy.AllowAnyOrigin()
+            policy.AllowAnyOrigin()
                   .AllowAnyMethod()
                   .AllowAnyHeader();
         });
