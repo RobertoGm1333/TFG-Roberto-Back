@@ -15,8 +15,11 @@ CREATE TABLE Usuario (
 
 INSERT INTO Usuario (Nombre, Apellido, Contraseña, Email, Fecha_Registro, Rol, Activo)
 VALUES 
-('Juan', 'Juanez', 'juan123', 'juanjuan@gmail.com', SYSDATETIME(), 'admin', 1),
-('Fran', 'Franez', 'fran123', 'franfran@gmail.com', SYSDATETIME(), 'protectora', 1);
+('Roberto', 'Gomez', 'rob123', 'robadmin@gmail.com', SYSDATETIME(), 'admin', 1),
+('Fran', 'Franez', 'fran123', 'franfran@gmail.com', SYSDATETIME(), 'protectora', 1),
+('Paco', 'Sulivan', 'paco123', 'pacopaco@gmail.com', SYSDATETIME(), 'protectora', 1),
+('Juan', 'Franez', 'juan123', 'juanjuan@gmail.com', SYSDATETIME(), 'usuario', 1),
+('Adriana', 'Franez', 'adriana123', 'adrianaadriana@gmail.com', SYSDATETIME(), 'usuario', 1);
 
 -- Tabla Protectora con relación a Usuario
 CREATE TABLE Protectora (
@@ -34,7 +37,7 @@ CREATE TABLE Protectora (
 INSERT INTO Protectora (Nombre_Protectora, Direccion, Correo_Protectora, Telefono_Protectora, Pagina_Web, Imagen_Protectora, Id_Usuario)
 VALUES 
 ('Bigotes Callejeros', 'El Picarral', 'Bigotescallejeros@gmail.com', '123456789', 'https://bigotescallejeros.wordpress.com/', '/Images/protectoras/BigotesCallejeros.png', 2),
-('Adala', 'Casco antiguo', 'adala@gmail.com', '14141414', 'www.adalazaragoza.com', '/Images/protectoras/Adala.png', 2);
+('Adala', 'Casco antiguo', 'adala@gmail.com', '14141414', 'www.adalazaragoza.com', '/Images/protectoras/Adala.png', 3);
 
 -- Tabla Gato con campo Visible
 CREATE TABLE Gato (
