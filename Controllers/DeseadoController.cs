@@ -33,6 +33,19 @@ namespace ProtectoraAPI.Controllers
            return Ok(deseado);
        }
 
+        [HttpGet("usuario/{Id_Usuario}")]
+       public async Task<IActionResult> ObtenerDeseadosPorUsuario(int Id_Usuario)
+       {
+           var deseados = await _repository.ObtenerDeseadosPorUsuarioAsync(Id_Usuario);
+
+           if (deseados == null || !deseados.Any())
+           {
+               return NotFound(new { message = "No hay gatos en deseados para este usuario." });
+           } 
+
+           return Ok(deseados);
+       }
+
        [HttpPost]
        public async Task<ActionResult<Deseado>> CreateDeseado(Deseado deseado)
        {

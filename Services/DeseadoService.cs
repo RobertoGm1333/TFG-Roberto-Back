@@ -27,6 +27,10 @@ namespace ProtectoraAPI.Services
         {
             await _repository.AddAsync(deseado);
         }
+        public async Task UpdateAsync(Deseado deseado)
+        {
+            await _repository.UpdateAsync(deseado);
+        }
 
         public async Task DeleteAsync(int id)
         {

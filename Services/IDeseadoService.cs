@@ -7,6 +7,7 @@ namespace ProtectoraAPI.Services
         Task<List<Deseado>> GetAllAsync();
         Task<Deseado?> GetByIdAsync(int id);
         Task AddAsync(Deseado deseado);
+        Task UpdateAsync(Deseado deseado);
         Task DeleteAsync(int id);
     }
 }
