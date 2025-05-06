@@ -192,5 +192,23 @@ namespace ProtectoraAPI.Repositories
 
             return null;
         }
+        public async Task<bool> ActualizarContraseñaAsync(int idUsuario, string nuevaContraseña)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                string query = "UPDATE Usuario SET Contraseña = @NuevaContraseña WHERE Id_Usuario = @IdUsuario";
+
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@NuevaContraseña", nuevaContraseña);
+                    command.Parameters.AddWithValue("@IdUsuario", idUsuario);
+
+                    int rowsAffected = await command.ExecuteNonQueryAsync();
+                    return rowsAffected > 0; // Retorna true si la contraseña se actualizó correctamente
+                }
+            }
+        }
     }
 }

@@ -10,5 +10,6 @@ namespace ProtectoraAPI.Repositories
         Task UpdateAsync(Usuario usuario);
         Task DeleteAsync(int id);
         Task<Usuario?> GetByEmailAndPasswordAsync(string email, string password);
+        Task<bool> ActualizarContraseñaAsync(int idUsuario, string nuevaContraseña);
     }
 }
