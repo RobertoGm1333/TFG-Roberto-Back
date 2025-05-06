@@ -104,22 +104,30 @@ namespace ProtectoraAPI.Repositories
             }
         }
 
-        public async Task AddAsync(Deseado deseado)
+        public async Task<Deseado> AddAsync(Deseado deseado)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
 
-                string query = "INSERT INTO Deseados (Id_Usuario, Id_Gato, Fecha_Deseado) VALUES (@Id_Usuario, @Id_Gato, @Fecha_Deseado)";
+                string query = @"
+                    INSERT INTO Deseados (Id_Usuario, Id_Gato, Fecha_Deseado)
+                    VALUES (@Id_Usuario, @Id_Gato, @Fecha_Deseado);
+                    SELECT SCOPE_IDENTITY();";
+
                 using (var command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id_Usuario", deseado.Id_Usuario);
                     command.Parameters.AddWithValue("@Id_Gato", deseado.Id_Gato);
                     command.Parameters.AddWithValue("@Fecha_Deseado", deseado.Fecha_Deseado);
 
-                    await command.ExecuteNonQueryAsync();
+                    // Obtenemos el ID generado
+                    var result = await command.ExecuteScalarAsync();
+                    deseado.Id_Deseado = Convert.ToInt32(result);
                 }
             }
+
+            return deseado;
         }
 
         public async Task UpdateAsync(Deseado deseado)

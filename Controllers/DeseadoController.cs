@@ -46,12 +46,12 @@ namespace ProtectoraAPI.Controllers
            return Ok(deseados);
        }
 
-       [HttpPost]
-       public async Task<ActionResult<Deseado>> CreateDeseado(Deseado deseado)
-       {
-           await _repository.AddAsync(deseado);
-           return CreatedAtAction(nameof(GetDeseado), new { id = deseado.Id_Deseado }, deseado);
-       }
+        [HttpPost]
+        public async Task<ActionResult<Deseado>> CreateDeseado(Deseado deseado)
+        {
+            var creado = await _repository.AddAsync(deseado);
+            return CreatedAtAction(nameof(GetDeseado), new { id = creado.Id_Deseado }, creado);
+        }
 
        [HttpDelete("{id}")]
        public async Task<IActionResult> DeleteDeseado(int id)
