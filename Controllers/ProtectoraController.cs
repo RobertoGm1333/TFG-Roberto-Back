@@ -72,5 +72,16 @@ namespace ProtectoraAPI.Controllers
            await _repository.DeleteAsync(id);
            return NoContent();
        }
+       [HttpGet("usuario/{idUsuario}")]
+public async Task<ActionResult<Protectora>> GetProtectoraPorUsuario(int idUsuario)
+{
+    var protectora = await _repository.GetByUsuarioIdAsync(idUsuario);
+
+    if (protectora == null)
+        return NotFound();
+
+    return Ok(protectora);
+}
+
    }
 }

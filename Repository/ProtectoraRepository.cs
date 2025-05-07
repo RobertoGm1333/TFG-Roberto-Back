@@ -150,5 +150,33 @@ namespace ProtectoraAPI.Repositories
                 }
             }
         }
+        public async Task<Protectora?> GetByUsuarioIdAsync(int idUsuario)
+{
+    using var connection = new SqlConnection(_connectionString);
+    await connection.OpenAsync();
+
+    string query = "SELECT * FROM Protectora WHERE Id_Usuario = @idUsuario";
+    using var command = new SqlCommand(query, connection);
+    command.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+    using var reader = await command.ExecuteReaderAsync();
+    if (await reader.ReadAsync())
+    {
+        return new Protectora
+        {
+            Id_Protectora = reader.GetInt32(0),
+            Nombre_Protectora = reader.GetString(1),
+            Direccion = reader.GetString(2),
+            Correo_Protectora = reader.GetString(3),
+            Telefono_Protectora = reader.GetString(4),
+            Pagina_Web = reader.GetString(5),
+            Imagen_Protectora = reader.GetString(6),
+            Id_Usuario = reader.GetInt32(7)
+        };
+    }
+
+    return null;
+}
+
     }
 }

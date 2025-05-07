@@ -9,5 +9,7 @@ namespace ProtectoraAPI.Repositories
         Task AddAsync(Protectora protectora);
         Task UpdateAsync(Protectora protectora);
         Task DeleteAsync(int id);
+        Task<Protectora?> GetByUsuarioIdAsync(int idUsuario);
+
     }
 }
