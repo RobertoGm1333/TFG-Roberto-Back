@@ -33,12 +33,21 @@ namespace ProtectoraAPI.Controllers
            return Ok(gato);
        }
 
-       [HttpPost]
-       public async Task<ActionResult<Gato>> CreateGato(Gato gato)
-       {
-           await _repository.AddAsync(gato);
-           return CreatedAtAction(nameof(GetGato), new { id = gato.Id_Gato }, gato);
-       }
+        [HttpPost]
+        public async Task<ActionResult<Gato>> CreateGato(Gato gato)
+        {
+            // Evitar que EF intente usar el ID si viene como 0
+            if (gato.Id_Gato == 0)
+            {
+                // Esto le dice a EF que no use el valor 0
+                // y que deje que la base de datos lo genere
+                ModelState.Remove(nameof(gato.Id_Gato));
+            }
+
+            await _repository.AddAsync(gato);
+            return CreatedAtAction(nameof(GetGato), new { id = gato.Id_Gato }, gato);
+        }
+
 
        [HttpPut("{id}")]
        public async Task<IActionResult> UpdateGato(int id, Gato updatedGato)

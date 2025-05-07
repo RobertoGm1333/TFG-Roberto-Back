@@ -49,7 +49,7 @@ CREATE TABLE Gato (
     Esterilizado BIT NOT NULL,
     Sexo VARCHAR(10) NOT NULL,
     Descripcion_Gato VARCHAR(1000) NOT NULL,
-    Imagen_Gato VARCHAR(100),
+    Imagen_Gato VARCHAR(5000),
     Visible BIT NOT NULL DEFAULT 1,
     FOREIGN KEY (Id_Protectora) REFERENCES Protectora(Id_Protectora)
 );

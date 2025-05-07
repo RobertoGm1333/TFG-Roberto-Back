@@ -92,7 +92,11 @@ namespace ProtectoraAPI.Repositories
             {
                 await connection.OpenAsync();
 
-                string query = "INSERT INTO Gato (Id_Protectora, Nombre_Gato, Raza, Edad, Esterilizado, Sexo, Descripcion_Gato, Imagen_Gato, Visible) VALUES (@Id_Protectora, @Nombre_Gato, @Raza, @Edad, @Esterilizado, @Sexo, @Descripcion_Gato, @Imagen_Gato, @Visible)";
+                string query = @"
+                    INSERT INTO Gato (Id_Protectora, Nombre_Gato, Raza, Edad, Esterilizado, Sexo, Descripcion_Gato, Imagen_Gato, Visible)
+                    OUTPUT INSERTED.Id_Gato
+                    VALUES (@Id_Protectora, @Nombre_Gato, @Raza, @Edad, @Esterilizado, @Sexo, @Descripcion_Gato, @Imagen_Gato, @Visible)";
+
                 using (var command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id_Protectora", gato.Id_Protectora);
@@ -105,10 +109,16 @@ namespace ProtectoraAPI.Repositories
                     command.Parameters.AddWithValue("@Imagen_Gato", gato.Imagen_Gato);
                     command.Parameters.AddWithValue("@Visible", gato.Visible);
 
-                    await command.ExecuteNonQueryAsync();
+                    // Recupera el ID generado automáticamente
+                    var idGenerado = await command.ExecuteScalarAsync();
+                    if (idGenerado != null)
+                    {
+                        gato.Id_Gato = Convert.ToInt32(idGenerado);
+                    }
                 }
             }
         }
+
 
         public async Task UpdateAsync(Gato gato)
         {
