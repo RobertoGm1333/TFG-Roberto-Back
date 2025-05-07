@@ -88,7 +88,11 @@ namespace ProtectoraAPI.Repositories
             {
                 await connection.OpenAsync();
 
-                string query = "INSERT INTO Protectora (Nombre_Protectora, Direccion, Correo_Protectora, Telefono_Protectora, Pagina_Web, Imagen_Protectora, Id_Usuario) VALUES (@Nombre_Protectora, @Direccion, @Correo_Protectora, @Telefono_Protectora, @Pagina_Web, @Imagen_Protectora, @Id_Usuario)";
+                string query = @"
+                    INSERT INTO Protectora (Nombre_Protectora, Direccion, Correo_Protectora, Telefono_Protectora, Pagina_Web, Imagen_Protectora, Id_Usuario)
+                    OUTPUT INSERTED.Id_Protectora
+                    VALUES (@Nombre_Protectora, @Direccion, @Correo_Protectora, @Telefono_Protectora, @Pagina_Web, @Imagen_Protectora, @Id_Usuario)";
+
                 using (var command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Nombre_Protectora", protectora.Nombre_Protectora);
@@ -99,7 +103,11 @@ namespace ProtectoraAPI.Repositories
                     command.Parameters.AddWithValue("@Imagen_Protectora", protectora.Imagen_Protectora);
                     command.Parameters.AddWithValue("@Id_Usuario", protectora.Id_Usuario);
 
-                    await command.ExecuteNonQueryAsync();
+                    var idGenerado = await command.ExecuteScalarAsync();
+                    if (idGenerado != null)
+                    {
+                        protectora.Id_Protectora = Convert.ToInt32(idGenerado);
+                    }
                 }
             }
         }
