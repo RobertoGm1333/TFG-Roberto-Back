@@ -160,5 +160,45 @@ namespace ProtectoraAPI.Repositories
                 }
             }
         }
+        public async Task<IEnumerable<Gato>> ObtenerPorProtectoraAsync(int idProtectora)
+{
+    var gatos = new List<Gato>();
+
+    using (var connection = new SqlConnection(_connectionString))
+    {
+        await connection.OpenAsync();
+
+        string query = "SELECT * FROM Gato WHERE Id_Protectora = @IdProtectora";
+        using (var command = new SqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@IdProtectora", idProtectora);
+
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    var gato = new Gato
+                    {
+                        Id_Gato = reader.GetInt32(0),
+                        Id_Protectora = reader.GetInt32(1),
+                        Nombre_Gato = reader.GetString(2),
+                        Raza = reader.GetString(3),
+                        Edad = reader.GetInt32(4),
+                        Esterilizado = reader.GetBoolean(5),
+                        Sexo = reader.GetString(6),
+                        Descripcion_Gato = reader.GetString(7),
+                        Imagen_Gato = reader.GetString(8),
+                        Visible = reader.GetBoolean(9)
+                    };
+
+                    gatos.Add(gato);
+                }
+            }
+        }
+    }
+
+    return gatos;
+}
+
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProtectoraAPI.Repositories;
 using Models;
 
+
 namespace ProtectoraAPI.Controllers
 {
    [Route("api/[controller]")]
@@ -83,5 +84,17 @@ namespace ProtectoraAPI.Controllers
            await _repository.DeleteAsync(id);
            return NoContent();
        }
+
+[HttpGet("protectora/{idProtectora}")]
+public async Task<IActionResult> GetGatosPorProtectora(int idProtectora)
+{
+    var gatos = await _repository.ObtenerPorProtectoraAsync(idProtectora);
+
+    if (gatos == null || !gatos.Any())
+        return NotFound("No se encontraron gatos para esta protectora.");
+
+    return Ok(gatos);
+}
+
    }
 }

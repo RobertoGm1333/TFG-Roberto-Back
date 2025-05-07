@@ -9,5 +9,6 @@ namespace ProtectoraAPI.Repositories
         Task AddAsync(Gato gato);
         Task UpdateAsync(Gato gato);
         Task DeleteAsync(int id);
+        Task<IEnumerable<Gato>> ObtenerPorProtectoraAsync(int idProtectora);
     }
 }
