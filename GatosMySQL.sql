@@ -29,7 +29,7 @@ CREATE TABLE Protectora (
     Correo_Protectora VARCHAR(100) NOT NULL,
     Telefono_Protectora VARCHAR(15) NOT NULL,
     Pagina_Web VARCHAR(100) NOT NULL,
-    Imagen_Protectora VARCHAR(100) NOT NULL,
+    Imagen_Protectora VARCHAR(5000) NOT NULL,
     Id_Usuario INT NOT NULL,
     FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id_Usuario)
 );
@@ -37,7 +37,7 @@ CREATE TABLE Protectora (
 INSERT INTO Protectora (Nombre_Protectora, Direccion, Correo_Protectora, Telefono_Protectora, Pagina_Web, Imagen_Protectora, Id_Usuario)
 VALUES 
 ('Bigotes Callejeros', 'El Picarral', 'Bigotescallejeros@gmail.com', '123456789', 'https://bigotescallejeros.wordpress.com/', '/Images/protectoras/BigotesCallejeros.png', 2),
-('Adala', 'Casco antiguo', 'adala@gmail.com', '14141414', 'www.adalazaragoza.com', '/Images/protectoras/Adala.png', 3);
+('Adala', 'Casco antiguo', 'adala@gmail.com', '14141414', 'https://adalazaragoza.com/', '/Images/protectoras/Adala.png', 3);
 
 -- Tabla Gato con campo Visible
 CREATE TABLE Gato (

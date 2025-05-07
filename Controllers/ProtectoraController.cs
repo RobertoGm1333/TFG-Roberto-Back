@@ -51,8 +51,8 @@ namespace ProtectoraAPI.Controllers
 
            existingProtectora.Nombre_Protectora = updatedProtectora.Nombre_Protectora;
            existingProtectora.Direccion = updatedProtectora.Direccion;
-           existingProtectora.Email = updatedProtectora.Email;
-           existingProtectora.Telefono = updatedProtectora.Telefono;
+           existingProtectora.Correo_Protectora = updatedProtectora.Correo_Protectora;
+           existingProtectora.Telefono_Protectora = updatedProtectora.Telefono_Protectora;
            existingProtectora.Pagina_Web = updatedProtectora.Pagina_Web;
            existingProtectora.Imagen_Protectora = updatedProtectora.Imagen_Protectora;
            existingProtectora.Id_Usuario = updatedProtectora.Id_Usuario;
