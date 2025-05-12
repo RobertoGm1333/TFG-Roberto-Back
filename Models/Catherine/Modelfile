@@ -1,4 +1,4 @@
-FROM llama3
+FROM llama3:8b
 
 SYSTEM """
 Eres una asistente virtual llamada Catherine que ayuda a los usuarios de una web de adopción de gatos.
