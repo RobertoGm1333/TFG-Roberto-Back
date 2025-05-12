@@ -146,5 +146,48 @@ namespace ProtectoraAPI.Repositories
                 }
             }
         }
+
+        // 🆕 Nuevo método para obtener solicitudes de una protectora
+        public async Task<List<SolicitudAdopcion>> GetByProtectoraAsync(int idProtectora)
+        {
+            var solicitudes = new List<SolicitudAdopcion>();
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                string query = @"SELECT s.Id_Solicitud, s.Id_Usuario, s.Id_Gato, s.Fecha_Solicitud, s.Estado, s.Comentario_Usuario, s.Comentario_Protectora
+                                 FROM SolicitudAdopcion s
+                                 JOIN Gato g ON s.Id_Gato = g.Id_Gato
+                                 WHERE g.Id_Protectora = @IdProtectora
+                                 ORDER BY s.Fecha_Solicitud DESC;";
+
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@IdProtectora", idProtectora);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var solicitud = new SolicitudAdopcion
+                            {
+                                Id_Solicitud = reader.GetInt32(0),
+                                Id_Usuario = reader.GetInt32(1),
+                                Id_Gato = reader.GetInt32(2),
+                                Fecha_Solicitud = reader.GetDateTime(3),
+                                Estado = reader.GetString(4),
+                                Comentario_Usuario = reader.GetString(5),
+                                Comentario_Protectora = reader.GetString(6)
+                            };
+
+                            solicitudes.Add(solicitud);
+                        }
+                    }
+                }
+            }
+
+            return solicitudes;
+        }
     }
 }
