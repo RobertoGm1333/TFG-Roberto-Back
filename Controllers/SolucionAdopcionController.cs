@@ -101,6 +101,21 @@ namespace ProtectoraAPI.Controllers
             return Ok(solicitudes);
         }
 
+        // Filtrar solicitud por usuario y gato específico
+        [HttpGet("usuario/{idUsuario}/gato/{idGato}")]
+        public async Task<IActionResult> GetSolicitudPorUsuarioYGato(int idUsuario, int idGato)
+        {
+            var solicitudes = await _repository.GetAllAsync();
+            var solicitud = solicitudes.FirstOrDefault(s => s.Id_Usuario == idUsuario && s.Id_Gato == idGato);
+            
+            if (solicitud == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(solicitud);
+        }
+
     }
 
     // DTO para cambiar estado
