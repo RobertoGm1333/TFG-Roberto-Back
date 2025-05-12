@@ -189,5 +189,61 @@ namespace ProtectoraAPI.Repositories
 
             return solicitudes;
         }
+        public async Task<List<object>> GetSolicitudesByProtectoraAsync(int idProtectora)
+        {
+            var solicitudes = new List<object>();
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                string query = @"SELECT 
+                            s.Id_Solicitud,
+                            s.Id_Usuario,
+                            u.Nombre as Usuario,
+                            s.Id_Gato,
+                            g.Nombre_Gato as Gato,
+                            g.Imagen_Gato as Imagen,
+                            s.Fecha_Solicitud,
+                            s.Estado,
+                            s.Comentario_Usuario,
+                            s.Comentario_Protectora
+                         FROM SolicitudAdopcion s
+                         JOIN Gato g ON s.Id_Gato = g.Id_Gato
+                         JOIN Usuario u ON s.Id_Usuario = u.Id_Usuario
+                         WHERE g.Id_Protectora = @IdProtectora
+                         ORDER BY s.Fecha_Solicitud DESC;";
+
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@IdProtectora", idProtectora);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var solicitud = new
+                            {
+                                Id_Solicitud = reader.GetInt32(0),
+                                Id_Usuario = reader.GetInt32(1),
+                                Usuario = reader.GetString(2),
+                                Id_Gato = reader.GetInt32(3),
+                                Gato = reader.GetString(4),
+                                Imagen = reader.GetString(5),
+                                Fecha_Solicitud = reader.GetDateTime(6),
+                                Estado = reader.GetString(7),
+                                Comentario_Usuario = reader.GetString(8),
+                                Comentario_Protectora = reader.GetString(9)
+                            };
+
+                            solicitudes.Add(solicitud);
+                        }
+                    }
+                }
+            }
+
+            return solicitudes;
+        }
+
     }
 }

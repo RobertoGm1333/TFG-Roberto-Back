@@ -9,5 +9,6 @@ namespace ProtectoraAPI.Services
         Task AddAsync(SolicitudAdopcion solicitud);
         Task UpdateAsync(SolicitudAdopcion solicitud);
         Task DeleteAsync(int id);
+        Task<List<object>> GetSolicitudesByProtectoraAsync(int idProtectora);
     }
 }

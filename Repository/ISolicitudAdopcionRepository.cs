@@ -12,5 +12,6 @@ namespace ProtectoraAPI.Repositories
 
         // Nuevo método para obtener solicitudes de una protectora
         Task<List<SolicitudAdopcion>> GetByProtectoraAsync(int idProtectora);
+        Task<List<object>> GetSolicitudesByProtectoraAsync(int idProtectora);
     }
 }

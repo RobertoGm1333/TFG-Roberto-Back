@@ -36,5 +36,11 @@ namespace ProtectoraAPI.Services
         {
             await _repository.DeleteAsync(id);
         }
+
+        public async Task<List<object>> GetSolicitudesByProtectoraAsync(int idProtectora)
+        {
+            return await _repository.GetSolicitudesByProtectoraAsync(idProtectora);
+        }
+
     }
 }

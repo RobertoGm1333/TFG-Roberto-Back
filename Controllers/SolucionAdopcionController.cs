@@ -96,12 +96,12 @@ namespace ProtectoraAPI.Controllers
 
         // 🆕 Ver solicitudes por protectora (pendiente crear repo JOIN)
         [HttpGet("protectora/{idProtectora}")]
-        public async Task<IActionResult> GetSolicitudesDeProtectora(int idProtectora)
+        public async Task<IActionResult> GetSolicitudesPorProtectora(int idProtectora)
         {
-            // Aquí debes crear el método en Repository que devuelva solicitudes de la protectora con JOIN correcto
-            // Este endpoint es solo un placeholder hasta tener el método
-            return BadRequest("Este endpoint requiere implementación en Repository con JOIN.");
+            var solicitudes = await _repository.GetSolicitudesByProtectoraAsync(idProtectora);
+            return Ok(solicitudes);
         }
+
     }
 
     // DTO para cambiar estado
