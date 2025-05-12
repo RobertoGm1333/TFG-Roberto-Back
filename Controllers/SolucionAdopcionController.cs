@@ -70,12 +70,11 @@ namespace ProtectoraAPI.Controllers
         }
 
         // 🆕 Ver mis solicitudes (usuario loggeado)
-        [HttpGet("mias")]
-        public async Task<IActionResult> GetMisSolicitudes()
+        [HttpGet("usuario/{userId}")]
+        public async Task<IActionResult> GetMisSolicitudes(int userId)
         {
-            var idUsuario = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
             var solicitudes = await _repository.GetAllAsync();
-            var misSolicitudes = solicitudes.Where(s => s.Id_Usuario == idUsuario).ToList();
+            var misSolicitudes = solicitudes.Where(s => s.Id_Usuario == userId).ToList();
             return Ok(misSolicitudes);
         }
 
