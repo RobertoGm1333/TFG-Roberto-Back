@@ -26,18 +26,20 @@ CREATE TABLE Protectora (
     Id_Protectora INT IDENTITY(1,1) PRIMARY KEY,
     Nombre_Protectora VARCHAR(100) NOT NULL,
     Direccion VARCHAR(100) NOT NULL,
+    Ubicacion VARCHAR(5000) NOT NULL,
     Correo_Protectora VARCHAR(100) NOT NULL,
     Telefono_Protectora VARCHAR(15) NOT NULL,
     Pagina_Web VARCHAR(100) NOT NULL,
     Imagen_Protectora VARCHAR(5000) NOT NULL,
+    Descripcion_Protectora VARCHAR(1000) NOT NULL,
     Id_Usuario INT NOT NULL,
     FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id_Usuario)
 );
 
-INSERT INTO Protectora (Nombre_Protectora, Direccion, Correo_Protectora, Telefono_Protectora, Pagina_Web, Imagen_Protectora, Id_Usuario)
+INSERT INTO Protectora (Nombre_Protectora, Direccion, Ubicacion, Correo_Protectora, Telefono_Protectora, Pagina_Web, Imagen_Protectora, Descripcion_Protectora, Id_Usuario)
 VALUES 
-('Bigotes Callejeros', 'El Picarral', 'Bigotescallejeros@gmail.com', '123456789', 'https://bigotescallejeros.wordpress.com/', '/Images/protectoras/BigotesCallejeros.png', 2),
-('Adala', 'Casco antiguo', 'adala@gmail.com', '14141414', 'https://adalazaragoza.com/', '/Images/protectoras/Adala.png', 3);
+('Bigotes Callejeros', 'Zaragoza', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5962.117626099076!2d-0.8885988235248283!3d41.65447127938542!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd5914ea701a7919%3A0x1cd9cb8c1bef89d4!2sC.%20del%20Conde%20de%20Aranda%2C%2015%2C%20Casco%20Antiguo%2C%2050004%20Zaragoza!5e0!3m2!1ses!2ses!4v1747118352684!5m2!1ses!2ses', 'bigotescallejeroszgz@gmail.com', '123456789', 'https://bigotescallejeros.wordpress.com/', '/Images/protectoras/BigotesCallejeros.png', 'Somos una pequeña protectora de animales de Zaragoza que se encarga de velar por el bienestar de los gatos abandonados y darles la calidad de vida que merecen.' ,2),
+('Adala', 'Zaragoza', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2982.4430154893716!2d-0.9094092235259463!3d41.62455468124995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd596acc8696b2c1%3A0x81fd841dde9baa53!2sP.%C2%BA%20de%20los%20Infantes%20de%20Espa%C3%B1a%2C%2050012%2C%20Zaragoza!5e0!3m2!1ses!2ses!4v1747115917216!5m2!1ses!2ses','adalazaragoza@gmail.com', '654 616 982', 'https://adalazaragoza.com/', '/Images/protectoras/Adala.png', 'ADALA es una asociación sin ánimo de lucro cuyo objetivo es mejorar la vida de animales maltratados y/o abandonados. ADALA está compuesta por una red de casas de acogida que abren las puertas de su hogar a nuestros animales hasta que son adoptados. No contamos con refugio propio.' ,3);
 
 -- Tabla Gato con campo Visible
 CREATE TABLE Gato (
