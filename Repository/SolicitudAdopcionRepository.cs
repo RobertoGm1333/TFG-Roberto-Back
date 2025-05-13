@@ -121,51 +121,25 @@ namespace ProtectoraAPI.Repositories
                 string query = @"
                     INSERT INTO SolicitudAdopcion (
                         Id_Usuario, Id_Gato, Fecha_Solicitud, Estado, NombreCompleto, 
-                        Edad, Direccion, Telefono, Email, TipoVivienda, PropiedadAlquiler,
+                        Edad, Direccion, DNI, Telefono, Email, TipoVivienda, PropiedadAlquiler,
                         PermiteAnimales, NumeroPersonas, HayNinos, EdadesNinos, ExperienciaGatos,
                         TieneOtrosAnimales, CortarUnas, AnimalesVacunadosEsterilizados, HistorialMascotas,
                         MotivacionAdopcion, ProblemasComportamiento, EnfermedadesCostosas,
-                        Vacaciones, SeguimientoPostAdopcion, VisitaHogar, Comentario_Protectora
+                        Vacaciones, SeguimientoPostAdopcion, VisitaHogar, Fotos_Hogar, Fotos_DNI, Comentario_Protectora
                     )
                     OUTPUT INSERTED.Id_Solicitud
                     VALUES (
                         @Id_Usuario, @Id_Gato, @Fecha_Solicitud, @Estado, @NombreCompleto,
-                        @Edad, @Direccion, @Telefono, @Email, @TipoVivienda, @PropiedadAlquiler,
+                        @Edad, @Direccion, @DNI, @Telefono, @Email, @TipoVivienda, @PropiedadAlquiler,
                         @PermiteAnimales, @NumeroPersonas, @HayNinos, @EdadesNinos, @ExperienciaGatos,
                         @TieneOtrosAnimales, @CortarUnas, @AnimalesVacunadosEsterilizados, @HistorialMascotas,
                         @MotivacionAdopcion, @ProblemasComportamiento, @EnfermedadesCostosas,
-                        @Vacaciones, @SeguimientoPostAdopcion, @VisitaHogar, @Comentario_Protectora
+                        @Vacaciones, @SeguimientoPostAdopcion, @VisitaHogar, @Fotos_Hogar, @Fotos_DNI, @Comentario_Protectora
                     )";
+
                 using (var command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Id_Usuario", solicitud.Id_Usuario);
-                    command.Parameters.AddWithValue("@Id_Gato", solicitud.Id_Gato);
-                    command.Parameters.AddWithValue("@Fecha_Solicitud", solicitud.Fecha_Solicitud);
-                    command.Parameters.AddWithValue("@Estado", solicitud.Estado);
-                    command.Parameters.AddWithValue("@NombreCompleto", solicitud.NombreCompleto ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@Edad", solicitud.Edad ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@Direccion", solicitud.Direccion ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@Telefono", solicitud.Telefono ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@Email", solicitud.Email ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@TipoVivienda", solicitud.TipoVivienda ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@PropiedadAlquiler", solicitud.PropiedadAlquiler ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@PermiteAnimales", solicitud.PermiteAnimales ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@NumeroPersonas", solicitud.NumeroPersonas ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@HayNinos", solicitud.HayNinos ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@EdadesNinos", solicitud.EdadesNinos ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@ExperienciaGatos", solicitud.ExperienciaGatos ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@TieneOtrosAnimales", solicitud.TieneOtrosAnimales ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@CortarUnas", solicitud.CortarUnas ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@AnimalesVacunadosEsterilizados", solicitud.AnimalesVacunadosEsterilizados ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@HistorialMascotas", solicitud.HistorialMascotas ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@MotivacionAdopcion", solicitud.MotivacionAdopcion ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@ProblemasComportamiento", solicitud.ProblemasComportamiento ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@EnfermedadesCostosas", solicitud.EnfermedadesCostosas ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@Vacaciones", solicitud.Vacaciones ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@SeguimientoPostAdopcion", solicitud.SeguimientoPostAdopcion ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@VisitaHogar", solicitud.VisitaHogar ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@Comentario_Protectora", solicitud.Comentario_Protectora ?? (object)DBNull.Value);
-
+                    AddSolicitudParameters(command, solicitud);
                     var idSolicitud = await command.ExecuteScalarAsync();
                     solicitud.Id_Solicitud = Convert.ToInt32(idSolicitud);
                 }
@@ -300,6 +274,7 @@ namespace ProtectoraAPI.Repositories
                 NombreCompleto = reader.IsDBNull(reader.GetOrdinal("NombreCompleto")) ? null : reader.GetString(reader.GetOrdinal("NombreCompleto")),
                 Edad = reader.IsDBNull(reader.GetOrdinal("Edad")) ? null : reader.GetInt32(reader.GetOrdinal("Edad")),
                 Direccion = reader.IsDBNull(reader.GetOrdinal("Direccion")) ? null : reader.GetString(reader.GetOrdinal("Direccion")),
+                DNI = reader.IsDBNull(reader.GetOrdinal("DNI")) ? null : reader.GetString(reader.GetOrdinal("DNI")),
                 Telefono = reader.IsDBNull(reader.GetOrdinal("Telefono")) ? null : reader.GetString(reader.GetOrdinal("Telefono")),
                 Email = reader.IsDBNull(reader.GetOrdinal("Email")) ? null : reader.GetString(reader.GetOrdinal("Email")),
                 TipoVivienda = reader.IsDBNull(reader.GetOrdinal("TipoVivienda")) ? null : reader.GetString(reader.GetOrdinal("TipoVivienda")),
@@ -319,6 +294,8 @@ namespace ProtectoraAPI.Repositories
                 Vacaciones = reader.IsDBNull(reader.GetOrdinal("Vacaciones")) ? null : reader.GetString(reader.GetOrdinal("Vacaciones")),
                 SeguimientoPostAdopcion = reader.IsDBNull(reader.GetOrdinal("SeguimientoPostAdopcion")) ? null : reader.GetBoolean(reader.GetOrdinal("SeguimientoPostAdopcion")),
                 VisitaHogar = reader.IsDBNull(reader.GetOrdinal("VisitaHogar")) ? null : reader.GetBoolean(reader.GetOrdinal("VisitaHogar")),
+                Fotos_Hogar = reader.IsDBNull(reader.GetOrdinal("Fotos_Hogar")) ? null : reader.GetString(reader.GetOrdinal("Fotos_Hogar")),
+                Fotos_DNI = reader.IsDBNull(reader.GetOrdinal("Fotos_DNI")) ? null : reader.GetString(reader.GetOrdinal("Fotos_DNI")),
                 Comentario_Protectora = reader.IsDBNull(reader.GetOrdinal("Comentario_Protectora")) ? null : reader.GetString(reader.GetOrdinal("Comentario_Protectora"))
             };
         }
@@ -399,6 +376,7 @@ namespace ProtectoraAPI.Repositories
             command.Parameters.AddWithValue("@NombreCompleto", solicitud.NombreCompleto ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Edad", solicitud.Edad ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Direccion", solicitud.Direccion ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@DNI", solicitud.DNI ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Telefono", solicitud.Telefono ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Email", solicitud.Email ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@TipoVivienda", solicitud.TipoVivienda ?? (object)DBNull.Value);
@@ -418,6 +396,8 @@ namespace ProtectoraAPI.Repositories
             command.Parameters.AddWithValue("@Vacaciones", solicitud.Vacaciones ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@SeguimientoPostAdopcion", solicitud.SeguimientoPostAdopcion ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@VisitaHogar", solicitud.VisitaHogar ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@Fotos_Hogar", solicitud.Fotos_Hogar ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@Fotos_DNI", solicitud.Fotos_DNI ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Comentario_Protectora", solicitud.Comentario_Protectora ?? (object)DBNull.Value);
         }
     }

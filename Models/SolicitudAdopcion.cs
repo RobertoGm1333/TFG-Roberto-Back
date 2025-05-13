@@ -9,6 +9,7 @@ public class SolicitudAdopcion {
     public string? NombreCompleto { get; set; }
     public int? Edad { get; set; }
     public string? Direccion { get; set; }
+    public string? DNI { get; set; }
     public string? Telefono { get; set; }
     public string? Email { get; set; }
     public string? TipoVivienda { get; set; }
@@ -28,7 +29,11 @@ public class SolicitudAdopcion {
     public string? Vacaciones { get; set; }
     public bool? SeguimientoPostAdopcion { get; set; }
     public bool? VisitaHogar { get; set; }
+    public string? Fotos_Hogar { get; set; }
+    public string? Fotos_DNI { get; set; }
     public string? Comentario_Protectora { get; set; }
+    public int Id_Protectora { get; internal set; }
+
 
     public SolicitudAdopcion() {}
 
