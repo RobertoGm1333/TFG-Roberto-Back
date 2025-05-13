@@ -69,44 +69,43 @@ namespace ProtectoraAPI.Controllers
             return NoContent();
         }
 
-        // 🆕 Ver mis solicitudes (usuario loggeado)
-        [HttpGet("usuario/{userId}")]
-        public async Task<IActionResult> GetMisSolicitudes(int userId)
+        [HttpGet("usuario/{idUsuario}")]
+        public async Task<ActionResult<List<SolicitudAdopcion>>> GetSolicitudesPorUsuario(int idUsuario)
         {
-            var solicitudes = await _repository.GetAllAsync();
-            var misSolicitudes = solicitudes.Where(s => s.Id_Usuario == userId).ToList();
-            return Ok(misSolicitudes);
+            var solicitudes = await _repository.GetByUsuarioIdAsync(idUsuario);
+            return Ok(solicitudes);
         }
 
-        // 🆕 Cambiar estado y comentario (protectora)
-        [HttpPut("estado/{id}")]
-        public async Task<IActionResult> CambiarEstado(int id, [FromBody] CambiarEstadoDTO datos)
+        [HttpGet("gato/{idGato}")]
+        public async Task<ActionResult<List<SolicitudAdopcion>>> GetSolicitudesPorGato(int idGato)
         {
-            var solicitud = await _repository.GetByIdAsync(id);
-            if (solicitud == null)
-                return NotFound();
-
-            solicitud.Estado = datos.Estado;
-            solicitud.Comentario_Protectora = datos.Comentario_Protectora;
-            await _repository.UpdateAsync(solicitud);
-
-            return Ok(solicitud);
+            var solicitudes = await _repository.GetByGatoIdAsync(idGato);
+            return Ok(solicitudes);
         }
 
-        // 🆕 Ver solicitudes por protectora (pendiente crear repo JOIN)
         [HttpGet("protectora/{idProtectora}")]
-        public async Task<IActionResult> GetSolicitudesPorProtectora(int idProtectora)
+        public async Task<ActionResult<List<object>>> GetSolicitudesPorProtectora(int idProtectora)
         {
             var solicitudes = await _repository.GetSolicitudesByProtectoraAsync(idProtectora);
             return Ok(solicitudes);
         }
 
-        // Filtrar solicitud por usuario y gato específico
-        [HttpGet("usuario/{idUsuario}/gato/{idGato}")]
-        public async Task<IActionResult> GetSolicitudPorUsuarioYGato(int idUsuario, int idGato)
+        [HttpPut("estado/{id}")]
+        public async Task<IActionResult> UpdateEstado(int id, [FromBody] CambiarEstadoDTO datos)
         {
-            var solicitudes = await _repository.GetAllAsync();
-            var solicitud = solicitudes.FirstOrDefault(s => s.Id_Usuario == idUsuario && s.Id_Gato == idGato);
+            var solicitud = await _repository.GetByIdAsync(id);
+            if (solicitud == null)
+                return NotFound();
+
+            await _repository.UpdateEstadoAsync(id, datos.Estado, datos.Comentario_Protectora);
+            return NoContent();
+        }
+
+        [HttpGet("usuario/{idUsuario}/gato/{idGato}")]
+        public async Task<ActionResult<SolicitudAdopcion>> GetSolicitudPorUsuarioYGato(int idUsuario, int idGato)
+        {
+            var solicitudes = await _repository.GetByUsuarioIdAsync(idUsuario);
+            var solicitud = solicitudes.FirstOrDefault(s => s.Id_Gato == idGato);
             
             if (solicitud == null)
             {
@@ -115,13 +114,11 @@ namespace ProtectoraAPI.Controllers
 
             return Ok(solicitud);
         }
-
     }
 
-    // DTO para cambiar estado
     public class CambiarEstadoDTO
     {
-        public string Estado { get; set; }
-        public string Comentario_Protectora { get; set; }
+        public string Estado { get; set; } = "";
+        public string? Comentario_Protectora { get; set; }
     }
-}
+} 

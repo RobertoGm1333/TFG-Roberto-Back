@@ -1,7 +1,7 @@
 CREATE DATABASE GatosDB;
 USE GatosDB;
 
--- Tabla Usuario actualizada
+-- Tabla Usuario
 CREATE TABLE Usuario (
     Id_Usuario INT IDENTITY(1,1) PRIMARY KEY,
     Nombre VARCHAR(100) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE Usuario (
     Contraseña VARCHAR(100) NOT NULL,
     Email VARCHAR(100) NOT NULL UNIQUE,
     Fecha_Registro DATETIME NOT NULL,
-    Rol VARCHAR(20) NOT NULL DEFAULT 'usuario', -- 'usuario', 'admin', 'protectora'
+    Rol VARCHAR(20) NOT NULL DEFAULT 'usuario',
     Activo BIT NOT NULL DEFAULT 1
 );
 
@@ -21,7 +21,7 @@ VALUES
 ('Juan', 'Franez', 'juan123', 'juanjuan@gmail.com', SYSDATETIME(), 'usuario', 1),
 ('Adriana', 'Franez', 'adriana123', 'adrianaadriana@gmail.com', SYSDATETIME(), 'usuario', 1);
 
--- Tabla Protectora con relación a Usuario
+-- Tabla Protectora
 CREATE TABLE Protectora (
     Id_Protectora INT IDENTITY(1,1) PRIMARY KEY,
     Nombre_Protectora VARCHAR(100) NOT NULL,
@@ -41,7 +41,7 @@ VALUES
 ('Bigotes Callejeros', 'Zaragoza', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5962.117626099076!2d-0.8885988235248283!3d41.65447127938542!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd5914ea701a7919%3A0x1cd9cb8c1bef89d4!2sC.%20del%20Conde%20de%20Aranda%2C%2015%2C%20Casco%20Antiguo%2C%2050004%20Zaragoza!5e0!3m2!1ses!2ses!4v1747118352684!5m2!1ses!2ses', 'bigotescallejeroszgz@gmail.com', '123456789', 'https://bigotescallejeros.wordpress.com/', '/Images/protectoras/BigotesCallejeros.png', 'Somos una pequeña protectora de animales de Zaragoza que se encarga de velar por el bienestar de los gatos abandonados y darles la calidad de vida que merecen.' ,2),
 ('Adala', 'Zaragoza', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2982.4430154893716!2d-0.9094092235259463!3d41.62455468124995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd596acc8696b2c1%3A0x81fd841dde9baa53!2sP.%C2%BA%20de%20los%20Infantes%20de%20Espa%C3%B1a%2C%2050012%2C%20Zaragoza!5e0!3m2!1ses!2ses!4v1747115917216!5m2!1ses!2ses','adalazaragoza@gmail.com', '654 616 982', 'https://adalazaragoza.com/', '/Images/protectoras/Adala.png', 'ADALA es una asociación sin ánimo de lucro cuyo objetivo es mejorar la vida de animales maltratados y/o abandonados. ADALA está compuesta por una red de casas de acogida que abren las puertas de su hogar a nuestros animales hasta que son adoptados. No contamos con refugio propio.' ,3);
 
--- Tabla Gato con campo Visible
+-- Tabla Gato
 CREATE TABLE Gato (
     Id_Gato INT IDENTITY(1,1) PRIMARY KEY,
     Id_Protectora INT NOT NULL,
@@ -86,19 +86,46 @@ VALUES
 (1, 2, SYSDATETIME()),
 (1, 1, SYSDATETIME());
 
--- Tabla SolicitudAdopcion con estado y comentario de protectora
+-- NUEVA Tabla SolicitudAdopcionExtendida (reemplazo completo)
 CREATE TABLE SolicitudAdopcion (
     Id_Solicitud INT IDENTITY(1,1) PRIMARY KEY,
     Id_Usuario INT NOT NULL,
     Id_Gato INT NOT NULL,
     Fecha_Solicitud DATETIME NOT NULL DEFAULT GETDATE(),
-    Estado VARCHAR(20) NOT NULL DEFAULT 'pendiente', -- pendiente, aceptada, rechazada
-    Comentario_Usuario VARCHAR(500),
+    Estado VARCHAR(20) NOT NULL DEFAULT 'pendiente',
+    NombreCompleto VARCHAR(100),
+    Edad INT,
+    Direccion VARCHAR(255),
+    Telefono VARCHAR(20),
+    Email VARCHAR(100),
+    TipoVivienda VARCHAR(50),
+    PropiedadAlquiler VARCHAR(50),
+    PermiteAnimales BIT,
+    NumeroPersonas INT,
+    HayNinos BIT,
+    EdadesNinos VARCHAR(100),
+    ExperienciaGatos BIT,
+    TieneOtrosAnimales BIT,
+    CortarUnas BIT,
+    AnimalesVacunadosEsterilizados BIT,
+    HistorialMascotas VARCHAR(1000),
+    MotivacionAdopcion VARCHAR(1000),
+    ProblemasComportamiento VARCHAR(1000),
+    EnfermedadesCostosas VARCHAR(1000),
+    Vacaciones VARCHAR(1000),
+    SeguimientoPostAdopcion BIT,
+    VisitaHogar BIT,
     Comentario_Protectora VARCHAR(1000),
     FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id_Usuario),
     FOREIGN KEY (Id_Gato) REFERENCES Gato(Id_Gato)
 );
 
-INSERT INTO SolicitudAdopcion (Id_Usuario, Id_Gato, Comentario_Usuario, Comentario_Protectora)
-VALUES
-(1, 2, 'Me gustaría adoptar a Widow porque me encantan los gatos tranquilos.', 'Gracias por tu interés, Widow necesita una familia tranquila.');
+-- Tabla SolicitudAdopcionImagen
+CREATE TABLE SolicitudAdopcionImagen (
+    Id_Imagen INT IDENTITY(1,1) PRIMARY KEY,
+    Id_Solicitud INT NOT NULL,
+    TipoImagen VARCHAR(50) NOT NULL,
+    URLImagen VARCHAR(1000) NOT NULL,
+    Fecha_Subida DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (Id_Solicitud) REFERENCES SolicitudAdopcion(Id_Solicitud) ON DELETE CASCADE
+);
