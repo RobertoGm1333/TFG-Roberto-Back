@@ -116,8 +116,8 @@ CREATE TABLE SolicitudAdopcion (
     Vacaciones VARCHAR(1000),
     SeguimientoPostAdopcion BIT,
     VisitaHogar BIT,
-    Fotos_Hogar VARCHAR(1000),
-    Fotos_DNI VARCHAR(1000),
+    Fotos_Hogar VARCHAR(MAX),
+    Fotos_DNI VARCHAR(MAX),
     Comentario_Protectora VARCHAR(1000),
     FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id_Usuario),
     FOREIGN KEY (Id_Gato) REFERENCES Gato(Id_Gato)

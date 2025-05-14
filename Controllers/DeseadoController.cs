@@ -33,17 +33,24 @@ namespace ProtectoraAPI.Controllers
            return Ok(deseado);
        }
 
-        [HttpGet("usuario/{Id_Usuario}")]
-       public async Task<IActionResult> ObtenerDeseadosPorUsuario(int Id_Usuario)
+        [HttpGet("usuario/{idUsuario}")]
+       public async Task<IActionResult> ObtenerDeseadosPorUsuario(int idUsuario)
        {
-           var deseados = await _repository.ObtenerDeseadosPorUsuarioAsync(Id_Usuario);
-
-           if (deseados == null || !deseados.Any())
+           try
            {
-               return NotFound(new { message = "No hay gatos en deseados para este usuario." });
-           } 
+               var deseados = await _repository.ObtenerDeseadosPorUsuarioAsync(idUsuario);
 
-           return Ok(deseados);
+               if (deseados == null || !deseados.Any())
+               {
+                   return NotFound(new { message = "No hay gatos en deseados para este usuario." });
+               } 
+
+               return Ok(deseados);
+           }
+           catch (Exception ex)
+           {
+               return StatusCode(500, $"Error al obtener los deseados: {ex.Message}");
+           }
        }
 
         [HttpPost]

@@ -71,6 +71,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+// Configurar el servicio de archivos estáticos
+app.UseStaticFiles();
+
 app.MapControllers();
 
 app.Run();

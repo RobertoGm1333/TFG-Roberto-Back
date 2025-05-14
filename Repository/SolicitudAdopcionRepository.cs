@@ -114,9 +114,45 @@ namespace ProtectoraAPI.Repositories
 
         public async Task AddAsync(SolicitudAdopcion solicitud)
         {
+            // Validar los datos del modelo
+            solicitud.ValidarDatos();
+
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
+
+                // Primero verificar si el usuario y el gato existen
+                string checkQuery = @"
+                    SELECT 
+                        (SELECT COUNT(*) FROM Usuario WHERE Id_Usuario = @Id_Usuario) as UserExists,
+                        (SELECT COUNT(*) FROM Gato WHERE Id_Gato = @Id_Gato) as CatExists,
+                        (SELECT Id_Protectora FROM Gato WHERE Id_Gato = @Id_Gato) as ProtectoraId";
+
+                using (var checkCommand = new SqlCommand(checkQuery, connection))
+                {
+                    checkCommand.Parameters.AddWithValue("@Id_Usuario", solicitud.Id_Usuario);
+                    checkCommand.Parameters.AddWithValue("@Id_Gato", solicitud.Id_Gato);
+
+                    using (var reader = await checkCommand.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            bool userExists = reader.GetInt32(0) > 0;
+                            bool catExists = reader.GetInt32(1) > 0;
+
+                            if (!userExists)
+                                throw new Exception("El usuario especificado no existe.");
+                            if (!catExists)
+                                throw new Exception("El gato especificado no existe.");
+
+                            // Obtener y asignar el Id_Protectora
+                            if (!reader.IsDBNull(2))
+                            {
+                                solicitud.Id_Protectora = reader.GetInt32(2);
+                            }
+                        }
+                    }
+                }
 
                 string query = @"
                     INSERT INTO SolicitudAdopcion (
@@ -137,11 +173,38 @@ namespace ProtectoraAPI.Repositories
                         @Vacaciones, @SeguimientoPostAdopcion, @VisitaHogar, @Fotos_Hogar, @Fotos_DNI, @Comentario_Protectora
                     )";
 
-                using (var command = new SqlCommand(query, connection))
+                try
                 {
-                    AddSolicitudParameters(command, solicitud);
-                    var idSolicitud = await command.ExecuteScalarAsync();
-                    solicitud.Id_Solicitud = Convert.ToInt32(idSolicitud);
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        AddSolicitudParameters(command, solicitud);
+                        var idSolicitud = await command.ExecuteScalarAsync();
+                        if (idSolicitud != null)
+                        {
+                            solicitud.Id_Solicitud = Convert.ToInt32(idSolicitud);
+                        }
+                        else
+                        {
+                            throw new Exception("No se pudo obtener el ID de la solicitud creada.");
+                        }
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    var message = "Error al insertar en la base de datos: ";
+                    if (ex.Message.Contains("FK_"))
+                    {
+                        message += "Error de clave foránea. Asegúrese de que el usuario y el gato existen.";
+                    }
+                    else if (ex.Message.Contains("UQ_"))
+                    {
+                        message += "Ya existe una solicitud para este gato y usuario.";
+                    }
+                    else
+                    {
+                        message += ex.Message;
+                    }
+                    throw new Exception(message, ex);
                 }
             }
         }
@@ -369,36 +432,46 @@ namespace ProtectoraAPI.Repositories
 
         private void AddSolicitudParameters(SqlCommand command, SolicitudAdopcion solicitud)
         {
+            // Validar y truncar campos de texto si es necesario
+            string TruncateString(string value, int maxLength)
+            {
+                if (string.IsNullOrEmpty(value)) return null;
+                return value.Length <= maxLength ? value : value.Substring(0, maxLength);
+            }
+
+            // Campos requeridos
             command.Parameters.AddWithValue("@Id_Usuario", solicitud.Id_Usuario);
             command.Parameters.AddWithValue("@Id_Gato", solicitud.Id_Gato);
             command.Parameters.AddWithValue("@Fecha_Solicitud", solicitud.Fecha_Solicitud);
             command.Parameters.AddWithValue("@Estado", solicitud.Estado);
-            command.Parameters.AddWithValue("@NombreCompleto", solicitud.NombreCompleto ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Edad", solicitud.Edad ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Direccion", solicitud.Direccion ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@DNI", solicitud.DNI ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Telefono", solicitud.Telefono ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Email", solicitud.Email ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@TipoVivienda", solicitud.TipoVivienda ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@PropiedadAlquiler", solicitud.PropiedadAlquiler ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@PermiteAnimales", solicitud.PermiteAnimales ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@NumeroPersonas", solicitud.NumeroPersonas ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@HayNinos", solicitud.HayNinos ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@EdadesNinos", solicitud.EdadesNinos ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@ExperienciaGatos", solicitud.ExperienciaGatos ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@TieneOtrosAnimales", solicitud.TieneOtrosAnimales ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@CortarUnas", solicitud.CortarUnas ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@AnimalesVacunadosEsterilizados", solicitud.AnimalesVacunadosEsterilizados ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@HistorialMascotas", solicitud.HistorialMascotas ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@MotivacionAdopcion", solicitud.MotivacionAdopcion ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@ProblemasComportamiento", solicitud.ProblemasComportamiento ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@EnfermedadesCostosas", solicitud.EnfermedadesCostosas ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Vacaciones", solicitud.Vacaciones ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@SeguimientoPostAdopcion", solicitud.SeguimientoPostAdopcion ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@VisitaHogar", solicitud.VisitaHogar ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Fotos_Hogar", solicitud.Fotos_Hogar ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Fotos_DNI", solicitud.Fotos_DNI ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Comentario_Protectora", solicitud.Comentario_Protectora ?? (object)DBNull.Value);
+
+            // Campos opcionales con validación de longitud
+            command.Parameters.AddWithValue("@NombreCompleto", (object)TruncateString(solicitud.NombreCompleto, 100) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@Edad", (object)solicitud.Edad ?? DBNull.Value);
+            command.Parameters.AddWithValue("@Direccion", (object)TruncateString(solicitud.Direccion, 255) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@DNI", (object)TruncateString(solicitud.DNI, 20) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@Telefono", (object)TruncateString(solicitud.Telefono, 20) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@Email", (object)TruncateString(solicitud.Email, 100) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@TipoVivienda", (object)TruncateString(solicitud.TipoVivienda, 50) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@PropiedadAlquiler", (object)TruncateString(solicitud.PropiedadAlquiler, 50) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@PermiteAnimales", (object)solicitud.PermiteAnimales ?? DBNull.Value);
+            command.Parameters.AddWithValue("@NumeroPersonas", (object)solicitud.NumeroPersonas ?? DBNull.Value);
+            command.Parameters.AddWithValue("@HayNinos", (object)solicitud.HayNinos ?? DBNull.Value);
+            command.Parameters.AddWithValue("@EdadesNinos", (object)TruncateString(solicitud.EdadesNinos, 100) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@ExperienciaGatos", (object)solicitud.ExperienciaGatos ?? DBNull.Value);
+            command.Parameters.AddWithValue("@TieneOtrosAnimales", (object)solicitud.TieneOtrosAnimales ?? DBNull.Value);
+            command.Parameters.AddWithValue("@CortarUnas", (object)solicitud.CortarUnas ?? DBNull.Value);
+            command.Parameters.AddWithValue("@AnimalesVacunadosEsterilizados", (object)solicitud.AnimalesVacunadosEsterilizados ?? DBNull.Value);
+            command.Parameters.AddWithValue("@HistorialMascotas", (object)TruncateString(solicitud.HistorialMascotas, 1000) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@MotivacionAdopcion", (object)TruncateString(solicitud.MotivacionAdopcion, 1000) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@ProblemasComportamiento", (object)TruncateString(solicitud.ProblemasComportamiento, 1000) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@EnfermedadesCostosas", (object)TruncateString(solicitud.EnfermedadesCostosas, 1000) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@Vacaciones", (object)TruncateString(solicitud.Vacaciones, 1000) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@SeguimientoPostAdopcion", (object)solicitud.SeguimientoPostAdopcion ?? DBNull.Value);
+            command.Parameters.AddWithValue("@VisitaHogar", (object)solicitud.VisitaHogar ?? DBNull.Value);
+            command.Parameters.AddWithValue("@Fotos_Hogar", (object)TruncateString(solicitud.Fotos_Hogar, 1000) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@Fotos_DNI", (object)TruncateString(solicitud.Fotos_DNI, 1000) ?? DBNull.Value);
+            command.Parameters.AddWithValue("@Comentario_Protectora", (object)TruncateString(solicitud.Comentario_Protectora, 1000) ?? DBNull.Value);
         }
     }
 }
