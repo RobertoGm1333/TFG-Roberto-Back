@@ -2,6 +2,7 @@ using ProtectoraAPI.Controllers;
 using ProtectoraAPI.Repositories;
 using ProtectoraAPI.Services;
 using Microsoft.Extensions.FileProviders;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("GatosDB");
@@ -51,8 +52,13 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Agregar controladores
-builder.Services.AddControllers();
+// Agregar controladores con opciones para manejar referencias circulares
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
 
 // Configuración Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -65,6 +71,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
 // Configurar CORS

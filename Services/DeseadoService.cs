@@ -36,5 +36,10 @@ namespace ProtectoraAPI.Services
         {
             await _repository.DeleteAsync(id);
         }
+
+        public async Task<IEnumerable<Deseado>> ObtenerDeseadosPorUsuarioAsync(int idUsuario)
+        {
+            return await _repository.ObtenerDeseadosPorUsuarioAsync(idUsuario);
+        }
     }
 }

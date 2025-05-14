@@ -11,10 +11,12 @@ namespace ProtectoraAPI.Controllers
     public class SolicitudAdopcionController : ControllerBase
     {
         private readonly ISolicitudAdopcionRepository _repository;
+        private readonly ILogger<SolicitudAdopcionController> _logger;
 
-        public SolicitudAdopcionController(ISolicitudAdopcionRepository repository)
+        public SolicitudAdopcionController(ISolicitudAdopcionRepository repository, ILogger<SolicitudAdopcionController> logger)
         {
             _repository = repository;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -36,13 +38,16 @@ namespace ProtectoraAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<SolicitudAdopcion>> CreateSolicitud(SolicitudAdopcion solicitud)
+        public async Task<ActionResult<SolicitudAdopcion>> CreateSolicitud([FromBody] SolicitudAdopcion solicitud)
         {
             try
             {
+                _logger.LogInformation($"Recibida solicitud de adopción: {JsonSerializer.Serialize(solicitud)}");
+                
                 // Validaciones básicas
                 if (solicitud == null)
                 {
+                    _logger.LogWarning("La solicitud recibida es nula.");
                     return BadRequest(new { message = "La solicitud no puede estar vacía" });
                 }
 
@@ -68,6 +73,7 @@ namespace ProtectoraAPI.Controllers
 
                 if (validationErrors.Any())
                 {
+                    _logger.LogWarning($"Errores de validación: {string.Join(", ", validationErrors)}");
                     return BadRequest(new { message = "Errores de validación", errors = validationErrors });
                 }
 
@@ -77,23 +83,28 @@ namespace ProtectoraAPI.Controllers
                 try
                 {
                     await _repository.AddAsync(solicitud);
+                    _logger.LogInformation($"Solicitud de adopción creada con éxito. ID: {solicitud.Id_Solicitud}");
                     return CreatedAtAction(nameof(GetSolicitud), new { id = solicitud.Id_Solicitud }, solicitud);
                 }
                 catch (Exception ex) when (ex.Message.Contains("El usuario especificado no existe"))
                 {
+                    _logger.LogError(ex, "Error al crear solicitud: Usuario no existe");
                     return BadRequest(new { message = "El usuario especificado no existe en el sistema" });
                 }
                 catch (Exception ex) when (ex.Message.Contains("El gato especificado no existe"))
                 {
+                    _logger.LogError(ex, "Error al crear solicitud: Gato no existe");
                     return BadRequest(new { message = "El gato especificado no existe en el sistema" });
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError(ex, "Error interno al crear la solicitud");
                     return StatusCode(500, new { message = "Error al crear la solicitud", error = ex.Message });
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error no controlado al crear la solicitud");
                 return StatusCode(500, new { message = "Error interno del servidor", error = ex.Message });
             }
         }
@@ -139,6 +150,7 @@ namespace ProtectoraAPI.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, $"Error al obtener solicitudes del usuario {idUsuario}");
                 return StatusCode(500, $"Error al obtener las solicitudes: {ex.Message}");
             }
         }
@@ -173,11 +185,13 @@ namespace ProtectoraAPI.Controllers
         {
             try
             {
+                _logger.LogInformation($"Buscando solicitud para usuario {idUsuario} y gato {idGato}");
                 var solicitudes = await _repository.GetByUsuarioIdAsync(idUsuario);
                 var solicitud = solicitudes.FirstOrDefault(s => s.Id_Gato == idGato);
                 
                 if (solicitud == null)
                 {
+                    _logger.LogInformation($"No se encontró solicitud para usuario {idUsuario} y gato {idGato}");
                     return NotFound(new { message = "No existe una solicitud para este usuario y gato." });
                 }
 
@@ -185,6 +199,7 @@ namespace ProtectoraAPI.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, $"Error al obtener solicitud para usuario {idUsuario} y gato {idGato}");
                 return StatusCode(500, $"Error al obtener la solicitud: {ex.Message}");
             }
         }

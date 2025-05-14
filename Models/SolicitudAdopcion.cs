@@ -1,5 +1,6 @@
 namespace Models;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 public class SolicitudAdopcion {
     public int Id_Solicitud { get; set; }
@@ -32,6 +33,12 @@ public class SolicitudAdopcion {
     public bool? VisitaHogar { get; set; }
     public string? Comentario_Protectora { get; set; }
     public int? Id_Protectora { get; set; }
+    
+    // Estos campos no están en la base de datos pero pueden venir en solicitudes JSON
+    [JsonIgnore]
+    public string? Fotos_Hogar { get; set; }
+    [JsonIgnore]
+    public string? Fotos_DNI { get; set; }
 
     public SolicitudAdopcion() {}
 

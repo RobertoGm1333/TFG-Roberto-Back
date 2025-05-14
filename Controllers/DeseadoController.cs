@@ -53,6 +53,28 @@ namespace ProtectoraAPI.Controllers
            }
        }
 
+        // Endpoint para verificar si un gato está en la lista de deseados de un usuario
+        [HttpGet("usuario/{idUsuario}/gato/{idGato}")]
+        public async Task<IActionResult> GetDeseadoByUsuarioAndGato(int idUsuario, int idGato)
+        {
+            try
+            {
+                var deseados = await _repository.ObtenerDeseadosPorUsuarioAsync(idUsuario);
+                var deseado = deseados.FirstOrDefault(d => d.Id_Gato == idGato);
+                
+                if (deseado == null)
+                {
+                    return NotFound(new { message = "Este gato no está en la lista de deseados del usuario." });
+                }
+
+                return Ok(deseado);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al verificar el deseado: {ex.Message}");
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<Deseado>> CreateDeseado(Deseado deseado)
         {

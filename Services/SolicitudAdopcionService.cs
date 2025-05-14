@@ -1,5 +1,6 @@
 using Models;
 using ProtectoraAPI.Repositories;
+using System.Linq;
 
 namespace ProtectoraAPI.Services
 {
@@ -60,6 +61,12 @@ namespace ProtectoraAPI.Services
         public async Task<List<object>> GetSolicitudesByProtectoraAsync(int idProtectora)
         {
             return await _repository.GetSolicitudesByProtectoraAsync(idProtectora);
+        }
+
+        public async Task<SolicitudAdopcion?> GetByUsuarioAndGatoIdAsync(int idUsuario, int idGato)
+        {
+            var solicitudes = await _repository.GetByUsuarioIdAsync(idUsuario);
+            return solicitudes.FirstOrDefault(s => s.Id_Gato == idGato);
         }
     }
 }

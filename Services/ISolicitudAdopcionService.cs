@@ -14,5 +14,6 @@ namespace ProtectoraAPI.Services
         Task UpdateEstadoAsync(int id, string nuevoEstado, string? comentarioProtectora);
         Task<List<SolicitudAdopcion>> GetByProtectoraIdAsync(int idProtectora);
         Task<List<object>> GetSolicitudesByProtectoraAsync(int idProtectora);
+        Task<SolicitudAdopcion?> GetByUsuarioAndGatoIdAsync(int idUsuario, int idGato);
     }
 }
