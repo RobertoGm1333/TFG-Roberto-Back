@@ -30,8 +30,6 @@ public class SolicitudAdopcion {
     public string? Vacaciones { get; set; }
     public bool? SeguimientoPostAdopcion { get; set; }
     public bool? VisitaHogar { get; set; }
-    public string? Fotos_Hogar { get; set; }
-    public string? Fotos_DNI { get; set; }
     public string? Comentario_Protectora { get; set; }
     public int? Id_Protectora { get; set; }
 

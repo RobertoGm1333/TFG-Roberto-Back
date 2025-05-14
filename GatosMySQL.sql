@@ -116,19 +116,8 @@ CREATE TABLE SolicitudAdopcion (
     Vacaciones VARCHAR(1000),
     SeguimientoPostAdopcion BIT,
     VisitaHogar BIT,
-    Fotos_Hogar VARCHAR(MAX),
-    Fotos_DNI VARCHAR(MAX),
     Comentario_Protectora VARCHAR(1000),
     FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id_Usuario),
     FOREIGN KEY (Id_Gato) REFERENCES Gato(Id_Gato)
 );
 
--- Tabla SolicitudAdopcionImagen
-CREATE TABLE SolicitudAdopcionImagen (
-    Id_Imagen INT IDENTITY(1,1) PRIMARY KEY,
-    Id_Solicitud INT NOT NULL,
-    TipoImagen VARCHAR(50) NOT NULL,
-    URLImagen VARCHAR(1000) NOT NULL,
-    Fecha_Subida DATETIME NOT NULL DEFAULT GETDATE(),
-    FOREIGN KEY (Id_Solicitud) REFERENCES SolicitudAdopcion(Id_Solicitud) ON DELETE CASCADE
-);

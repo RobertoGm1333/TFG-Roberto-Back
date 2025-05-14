@@ -1,6 +1,7 @@
 using ProtectoraAPI.Controllers;
 using ProtectoraAPI.Repositories;
 using ProtectoraAPI.Services;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("GatosDB");
@@ -66,13 +67,25 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors(AllowAll);
-app.UseHttpsRedirection();
+// Configurar CORS
+app.UseCors(builder => builder
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
 
+app.UseHttpsRedirection();
 app.UseAuthorization();
 
 // Configurar el servicio de archivos estáticos
-app.UseStaticFiles();
+app.UseStaticFiles(); // Para wwwroot
+
+// Configurar el servicio de archivos estáticos para las imágenes del formulario
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "Images", "form")),
+    RequestPath = "/images"
+});
 
 app.MapControllers();
 

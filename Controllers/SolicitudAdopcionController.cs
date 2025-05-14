@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using ProtectoraAPI.Repositories;
 using Models;
+using System.Text.Json;
+using ProtectoraAPI.Services;
 
 namespace ProtectoraAPI.Controllers
 {
@@ -71,22 +73,6 @@ namespace ProtectoraAPI.Controllers
 
                 solicitud.Fecha_Solicitud = DateTime.Now;
                 solicitud.Estado = "pendiente";
-                
-                // Validar longitud de campos de texto e imágenes
-                const int MAX_IMAGE_SIZE = 500000; // 500KB por imagen
-
-                if (!string.IsNullOrEmpty(solicitud.Fotos_Hogar) && solicitud.Fotos_Hogar.Length > MAX_IMAGE_SIZE)
-                {
-                    return BadRequest(new { message = "Las imágenes del hogar son demasiado grandes. El tamaño máximo es 500KB por imagen." });
-                }
-                if (!string.IsNullOrEmpty(solicitud.Fotos_DNI) && solicitud.Fotos_DNI.Length > MAX_IMAGE_SIZE)
-                {
-                    return BadRequest(new { message = "Las imágenes del DNI son demasiado grandes. El tamaño máximo es 500KB por imagen." });
-                }
-
-                // Asegurarse de que los campos de imágenes sean null si están vacíos
-                solicitud.Fotos_Hogar = string.IsNullOrEmpty(solicitud.Fotos_Hogar) ? null : solicitud.Fotos_Hogar;
-                solicitud.Fotos_DNI = string.IsNullOrEmpty(solicitud.Fotos_DNI) ? null : solicitud.Fotos_DNI;
 
                 try
                 {
@@ -201,69 +187,6 @@ namespace ProtectoraAPI.Controllers
             {
                 return StatusCode(500, $"Error al obtener la solicitud: {ex.Message}");
             }
-        }
-
-        [HttpPost("{id}/imagenes")]
-        public async Task<IActionResult> SubirImagenes(int id, [FromForm] ImagenesRequest imagenes)
-        {
-            try
-            {
-                var solicitud = await _repository.GetByIdAsync(id);
-                if (solicitud == null)
-                    return NotFound("Solicitud no encontrada");
-
-                if (imagenes.FotosHogar != null)
-                {
-                    // Aquí implementarías la lógica para guardar la imagen
-                    // Por ejemplo, guardarla en un directorio y almacenar la ruta
-                    string rutaHogar = await GuardarImagen(imagenes.FotosHogar, "hogar");
-                    solicitud.Fotos_Hogar = rutaHogar;
-                }
-
-                if (imagenes.FotosDNI != null)
-                {
-                    string rutaDNI = await GuardarImagen(imagenes.FotosDNI, "dni");
-                    solicitud.Fotos_DNI = rutaDNI;
-                }
-
-                await _repository.UpdateAsync(solicitud);
-                return Ok("Imágenes subidas correctamente");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error al subir imágenes: {ex.Message}");
-                return StatusCode(500, "Error al procesar las imágenes");
-            }
-        }
-
-        private async Task<string> GuardarImagen(IFormFile archivo, string tipo)
-        {
-            try
-            {
-                string nombreArchivo = $"{Guid.NewGuid()}_{tipo}_{archivo.FileName}";
-                string directorio = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "imagenes", "solicitudes");
-                
-                if (!Directory.Exists(directorio))
-                    Directory.CreateDirectory(directorio);
-
-                string rutaCompleta = Path.Combine(directorio, nombreArchivo);
-                using (var stream = new FileStream(rutaCompleta, FileMode.Create))
-                {
-                    await archivo.CopyToAsync(stream);
-                }
-
-                return $"/imagenes/solicitudes/{nombreArchivo}";
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error al guardar la imagen: {ex.Message}");
-            }
-        }
-
-        public class ImagenesRequest
-        {
-            public IFormFile? FotosHogar { get; set; }
-            public IFormFile? FotosDNI { get; set; }
         }
     }
 

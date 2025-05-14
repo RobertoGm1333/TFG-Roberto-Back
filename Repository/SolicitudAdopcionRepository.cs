@@ -357,8 +357,6 @@ namespace ProtectoraAPI.Repositories
                 Vacaciones = reader.IsDBNull(reader.GetOrdinal("Vacaciones")) ? null : reader.GetString(reader.GetOrdinal("Vacaciones")),
                 SeguimientoPostAdopcion = reader.IsDBNull(reader.GetOrdinal("SeguimientoPostAdopcion")) ? null : reader.GetBoolean(reader.GetOrdinal("SeguimientoPostAdopcion")),
                 VisitaHogar = reader.IsDBNull(reader.GetOrdinal("VisitaHogar")) ? null : reader.GetBoolean(reader.GetOrdinal("VisitaHogar")),
-                Fotos_Hogar = reader.IsDBNull(reader.GetOrdinal("Fotos_Hogar")) ? null : reader.GetString(reader.GetOrdinal("Fotos_Hogar")),
-                Fotos_DNI = reader.IsDBNull(reader.GetOrdinal("Fotos_DNI")) ? null : reader.GetString(reader.GetOrdinal("Fotos_DNI")),
                 Comentario_Protectora = reader.IsDBNull(reader.GetOrdinal("Comentario_Protectora")) ? null : reader.GetString(reader.GetOrdinal("Comentario_Protectora"))
             };
         }
@@ -469,8 +467,6 @@ namespace ProtectoraAPI.Repositories
             command.Parameters.AddWithValue("@Vacaciones", (object)TruncateString(solicitud.Vacaciones, 1000) ?? DBNull.Value);
             command.Parameters.AddWithValue("@SeguimientoPostAdopcion", (object)solicitud.SeguimientoPostAdopcion ?? DBNull.Value);
             command.Parameters.AddWithValue("@VisitaHogar", (object)solicitud.VisitaHogar ?? DBNull.Value);
-            command.Parameters.AddWithValue("@Fotos_Hogar", (object)TruncateString(solicitud.Fotos_Hogar, 1000) ?? DBNull.Value);
-            command.Parameters.AddWithValue("@Fotos_DNI", (object)TruncateString(solicitud.Fotos_DNI, 1000) ?? DBNull.Value);
             command.Parameters.AddWithValue("@Comentario_Protectora", (object)TruncateString(solicitud.Comentario_Protectora, 1000) ?? DBNull.Value);
         }
     }
