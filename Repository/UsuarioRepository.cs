@@ -189,12 +189,27 @@ namespace ProtectoraAPI.Repositories
                 }
             }
 
-            if (usuario != null && BCrypt.Net.BCrypt.Verify(password, usuario.Contraseña))
-            {
-                usuario.Contraseña = ""; // No exponer el hash
-                return usuario;
-            }
+            if (usuario != null)
+                {
+                    bool esValida = false;
 
+                    try
+                    {
+                        // Intentamos verificar como hash
+                        esValida = BCrypt.Net.BCrypt.Verify(password, usuario.Contraseña);
+                    }
+                    catch
+                    {
+                        // Si falla (por no ser un hash), comparamos directamente
+                        esValida = usuario.Contraseña == password;
+                    }
+
+                    if (esValida)
+                    {
+                        usuario.Contraseña = ""; // Ocultamos por seguridad
+                        return usuario;
+                    }
+                }
             return null;
         }
 
