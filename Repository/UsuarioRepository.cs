@@ -1,5 +1,6 @@
 using Microsoft.Data.SqlClient;
 using Models;
+using BCrypt.Net; // Añadido para hasheo
 
 namespace ProtectoraAPI.Repositories
 {
@@ -87,6 +88,9 @@ namespace ProtectoraAPI.Repositories
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
+
+                // Hashear la contraseña antes de guardar
+                usuario.Contraseña = BCrypt.Net.BCrypt.HashPassword(usuario.Contraseña);
 
                 string query = "INSERT INTO Usuario (Nombre, Apellido, Contraseña, Email, Fecha_Registro, Rol, Activo) VALUES (@Nombre, @Apellido, @Contraseña, @Email, @Fecha_Registro, @Rol, @Activo)";
                 using (var command = new SqlCommand(query, connection))
@@ -185,28 +189,33 @@ namespace ProtectoraAPI.Repositories
                 }
             }
 
-            if (usuario != null && usuario.Contraseña == password)
+            if (usuario != null && BCrypt.Net.BCrypt.Verify(password, usuario.Contraseña))
             {
+                usuario.Contraseña = ""; // No exponer el hash
                 return usuario;
             }
 
             return null;
         }
+
         public async Task<bool> ActualizarContraseñaAsync(int idUsuario, string nuevaContraseña)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
 
+                // Hashear la nueva contraseña
+                string hash = BCrypt.Net.BCrypt.HashPassword(nuevaContraseña);
+
                 string query = "UPDATE Usuario SET Contraseña = @NuevaContraseña WHERE Id_Usuario = @IdUsuario";
 
                 using (var command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@NuevaContraseña", nuevaContraseña);
+                    command.Parameters.AddWithValue("@NuevaContraseña", hash);
                     command.Parameters.AddWithValue("@IdUsuario", idUsuario);
 
                     int rowsAffected = await command.ExecuteNonQueryAsync();
-                    return rowsAffected > 0; // Retorna true si la contraseña se actualizó correctamente
+                    return rowsAffected > 0;
                 }
             }
         }
