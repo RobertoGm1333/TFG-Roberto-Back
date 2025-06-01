@@ -1,5 +1,6 @@
 using Models;
 using ProtectoraAPI.Repositories;
+using System.Linq;
 
 namespace ProtectoraAPI.Services
 {
@@ -22,6 +23,16 @@ namespace ProtectoraAPI.Services
             return await _repository.GetByIdAsync(id);
         }
 
+        public async Task<List<SolicitudAdopcion>> GetByUsuarioIdAsync(int idUsuario)
+        {
+            return await _repository.GetByUsuarioIdAsync(idUsuario);
+        }
+
+        public async Task<List<SolicitudAdopcion>> GetByGatoIdAsync(int idGato)
+        {
+            return await _repository.GetByGatoIdAsync(idGato);
+        }
+
         public async Task AddAsync(SolicitudAdopcion solicitud)
         {
             await _repository.AddAsync(solicitud);
@@ -37,10 +48,25 @@ namespace ProtectoraAPI.Services
             await _repository.DeleteAsync(id);
         }
 
+        public async Task UpdateEstadoAsync(int id, string nuevoEstado, string? comentarioProtectora)
+        {
+            await _repository.UpdateEstadoAsync(id, nuevoEstado, comentarioProtectora);
+        }
+
+        public async Task<List<SolicitudAdopcion>> GetByProtectoraIdAsync(int idProtectora)
+        {
+            return await _repository.GetByProtectoraIdAsync(idProtectora);
+        }
+
         public async Task<List<object>> GetSolicitudesByProtectoraAsync(int idProtectora)
         {
             return await _repository.GetSolicitudesByProtectoraAsync(idProtectora);
         }
 
+        public async Task<SolicitudAdopcion?> GetByUsuarioAndGatoIdAsync(int idUsuario, int idGato)
+        {
+            var solicitudes = await _repository.GetByUsuarioIdAsync(idUsuario);
+            return solicitudes.FirstOrDefault(s => s.Id_Gato == idGato);
+        }
     }
 }

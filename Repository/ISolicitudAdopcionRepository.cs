@@ -6,12 +6,13 @@ namespace ProtectoraAPI.Repositories
     {
         Task<List<SolicitudAdopcion>> GetAllAsync();
         Task<SolicitudAdopcion?> GetByIdAsync(int id);
+        Task<List<SolicitudAdopcion>> GetByUsuarioIdAsync(int idUsuario);
+        Task<List<SolicitudAdopcion>> GetByGatoIdAsync(int idGato);
         Task AddAsync(SolicitudAdopcion solicitud);
         Task UpdateAsync(SolicitudAdopcion solicitud);
         Task DeleteAsync(int id);
-
-        // Nuevo método para obtener solicitudes de una protectora
-        Task<List<SolicitudAdopcion>> GetByProtectoraAsync(int idProtectora);
+        Task UpdateEstadoAsync(int id, string nuevoEstado, string? comentarioProtectora);
+        Task<List<SolicitudAdopcion>> GetByProtectoraIdAsync(int idProtectora);
         Task<List<object>> GetSolicitudesByProtectoraAsync(int idProtectora);
     }
 }

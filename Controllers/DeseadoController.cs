@@ -33,18 +33,47 @@ namespace ProtectoraAPI.Controllers
            return Ok(deseado);
        }
 
-        [HttpGet("usuario/{Id_Usuario}")]
-       public async Task<IActionResult> ObtenerDeseadosPorUsuario(int Id_Usuario)
+        [HttpGet("usuario/{idUsuario}")]
+       public async Task<IActionResult> ObtenerDeseadosPorUsuario(int idUsuario)
        {
-           var deseados = await _repository.ObtenerDeseadosPorUsuarioAsync(Id_Usuario);
-
-           if (deseados == null || !deseados.Any())
+           try
            {
-               return NotFound(new { message = "No hay gatos en deseados para este usuario." });
-           } 
+               var deseados = await _repository.ObtenerDeseadosPorUsuarioAsync(idUsuario);
 
-           return Ok(deseados);
+               if (deseados == null || !deseados.Any())
+               {
+                   return NotFound(new { message = "No hay gatos en deseados para este usuario." });
+               } 
+
+               return Ok(deseados);
+           }
+           catch (Exception ex)
+           {
+               return StatusCode(500, $"Error al obtener los deseados: {ex.Message}");
+           }
        }
+
+        // Endpoint para verificar si un gato está en la lista de deseados de un usuario
+        [HttpGet("usuario/{idUsuario}/gato/{idGato}")]
+        public async Task<IActionResult> GetDeseadoByUsuarioAndGato(int idUsuario, int idGato)
+        {
+            try
+            {
+                var deseados = await _repository.ObtenerDeseadosPorUsuarioAsync(idUsuario);
+                var deseado = deseados.FirstOrDefault(d => d.Id_Gato == idGato);
+                
+                if (deseado == null)
+                {
+                    return NotFound(new { message = "Este gato no está en la lista de deseados del usuario." });
+                }
+
+                return Ok(deseado);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al verificar el deseado: {ex.Message}");
+            }
+        }
 
         [HttpPost]
         public async Task<ActionResult<Deseado>> CreateDeseado(Deseado deseado)
