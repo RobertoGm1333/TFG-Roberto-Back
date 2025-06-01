@@ -7,7 +7,7 @@ on:
     branches: [ main, develop ]
 
 env:
-  EKS_CLUSTER_NAME: demo-cluter
+  EKS_CLUSTER_NAME: Cluster
   AWS_REGION: us-east-1
 
 jobs:
