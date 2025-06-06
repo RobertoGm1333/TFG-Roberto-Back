@@ -57,6 +57,7 @@ namespace ProtectoraAPI.Controllers
            existingProtectora.Imagen_Protectora = updatedProtectora.Imagen_Protectora;
            existingProtectora.Ubicacion = updatedProtectora.Ubicacion;
            existingProtectora.Descripcion_Protectora = updatedProtectora.Descripcion_Protectora;
+           existingProtectora.Descripcion_Protectora_En = updatedProtectora.Descripcion_Protectora_En; // Nuevo campo
            existingProtectora.Id_Usuario = updatedProtectora.Id_Usuario;
 
            await _repository.UpdateAsync(existingProtectora);
@@ -74,16 +75,16 @@ namespace ProtectoraAPI.Controllers
            await _repository.DeleteAsync(id);
            return NoContent();
        }
+
        [HttpGet("usuario/{idUsuario}")]
-public async Task<ActionResult<Protectora>> GetProtectoraPorUsuario(int idUsuario)
-{
-    var protectora = await _repository.GetByUsuarioIdAsync(idUsuario);
+       public async Task<ActionResult<Protectora>> GetProtectoraPorUsuario(int idUsuario)
+       {
+           var protectora = await _repository.GetByUsuarioIdAsync(idUsuario);
 
-    if (protectora == null)
-        return NotFound();
+           if (protectora == null)
+               return NotFound();
 
-    return Ok(protectora);
-}
-
+           return Ok(protectora);
+       }
    }
 }

@@ -65,6 +65,7 @@ namespace ProtectoraAPI.Controllers
            existingGato.Esterilizado = updatedGato.Esterilizado;
            existingGato.Sexo = updatedGato.Sexo;
            existingGato.Descripcion_Gato = updatedGato.Descripcion_Gato;
+           existingGato.Descripcion_Gato_En = updatedGato.Descripcion_Gato_En;
            existingGato.Imagen_Gato = updatedGato.Imagen_Gato;
            existingGato.Id_Protectora = updatedGato.Id_Protectora;
            existingGato.Visible = updatedGato.Visible;

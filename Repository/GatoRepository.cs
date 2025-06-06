@@ -37,8 +37,9 @@ namespace ProtectoraAPI.Repositories
                                 Esterilizado = reader.GetBoolean(5),
                                 Sexo = reader.GetString(6),
                                 Descripcion_Gato = reader.GetString(7),
-                                Imagen_Gato = reader.GetString(8),
-                                Visible = reader.GetBoolean(9)
+                                Descripcion_Gato_En = reader.GetString(8), // Assuming this column will always have a value
+                                Imagen_Gato = reader.GetString(9),
+                                Visible = reader.GetBoolean(10)
                             };
 
                             gatos.Add(gato);
@@ -76,8 +77,9 @@ namespace ProtectoraAPI.Repositories
                                 Esterilizado = reader.GetBoolean(5),
                                 Sexo = reader.GetString(6),
                                 Descripcion_Gato = reader.GetString(7),
-                                Imagen_Gato = reader.GetString(8),
-                                Visible = reader.GetBoolean(9)
+                                Descripcion_Gato_En = reader.GetString(8), // Assuming this column will always have a value
+                                Imagen_Gato = reader.GetString(9),
+                                Visible = reader.GetBoolean(10)
                             };
                         }
                     }
@@ -93,9 +95,9 @@ namespace ProtectoraAPI.Repositories
                 await connection.OpenAsync();
 
                 string query = @"
-                    INSERT INTO Gato (Id_Protectora, Nombre_Gato, Raza, Edad, Esterilizado, Sexo, Descripcion_Gato, Imagen_Gato, Visible)
+                    INSERT INTO Gato (Id_Protectora, Nombre_Gato, Raza, Edad, Esterilizado, Sexo, Descripcion_Gato, Descripcion_Gato_En, Imagen_Gato, Visible)
                     OUTPUT INSERTED.Id_Gato
-                    VALUES (@Id_Protectora, @Nombre_Gato, @Raza, @Edad, @Esterilizado, @Sexo, @Descripcion_Gato, @Imagen_Gato, @Visible)";
+                    VALUES (@Id_Protectora, @Nombre_Gato, @Raza, @Edad, @Esterilizado, @Sexo, @Descripcion_Gato, @Descripcion_Gato_En, @Imagen_Gato, @Visible)";
 
                 using (var command = new SqlCommand(query, connection))
                 {
@@ -106,6 +108,7 @@ namespace ProtectoraAPI.Repositories
                     command.Parameters.AddWithValue("@Esterilizado", gato.Esterilizado);
                     command.Parameters.AddWithValue("@Sexo", gato.Sexo);
                     command.Parameters.AddWithValue("@Descripcion_Gato", gato.Descripcion_Gato);
+                    command.Parameters.AddWithValue("@Descripcion_Gato_En", gato.Descripcion_Gato_En); // New field for English description
                     command.Parameters.AddWithValue("@Imagen_Gato", gato.Imagen_Gato);
                     command.Parameters.AddWithValue("@Visible", gato.Visible);
 
@@ -119,14 +122,13 @@ namespace ProtectoraAPI.Repositories
             }
         }
 
-
         public async Task UpdateAsync(Gato gato)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
 
-                string query = "UPDATE Gato SET Id_Protectora = @Id_Protectora, Nombre_Gato = @Nombre_Gato, Raza = @Raza, Edad = @Edad, Esterilizado = @Esterilizado, Sexo = @Sexo, Descripcion_Gato = @Descripcion_Gato, Imagen_Gato = @Imagen_Gato, Visible = @Visible WHERE Id_Gato = @Id_Gato";
+                string query = "UPDATE Gato SET Id_Protectora = @Id_Protectora, Nombre_Gato = @Nombre_Gato, Raza = @Raza, Edad = @Edad, Esterilizado = @Esterilizado, Sexo = @Sexo, Descripcion_Gato = @Descripcion_Gato, Descripcion_Gato_En = @Descripcion_Gato_En, Imagen_Gato = @Imagen_Gato, Visible = @Visible WHERE Id_Gato = @Id_Gato";
                 using (var command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id_Gato", gato.Id_Gato);
@@ -137,6 +139,7 @@ namespace ProtectoraAPI.Repositories
                     command.Parameters.AddWithValue("@Esterilizado", gato.Esterilizado);
                     command.Parameters.AddWithValue("@Sexo", gato.Sexo);
                     command.Parameters.AddWithValue("@Descripcion_Gato", gato.Descripcion_Gato);
+                    command.Parameters.AddWithValue("@Descripcion_Gato_En", gato.Descripcion_Gato_En); // New field for English description
                     command.Parameters.AddWithValue("@Imagen_Gato", gato.Imagen_Gato);
                     command.Parameters.AddWithValue("@Visible", gato.Visible);
 
@@ -160,45 +163,46 @@ namespace ProtectoraAPI.Repositories
                 }
             }
         }
+
         public async Task<IEnumerable<Gato>> ObtenerPorProtectoraAsync(int idProtectora)
-{
-    var gatos = new List<Gato>();
-
-    using (var connection = new SqlConnection(_connectionString))
-    {
-        await connection.OpenAsync();
-
-        string query = "SELECT * FROM Gato WHERE Id_Protectora = @IdProtectora";
-        using (var command = new SqlCommand(query, connection))
         {
-            command.Parameters.AddWithValue("@IdProtectora", idProtectora);
+            var gatos = new List<Gato>();
 
-            using (var reader = await command.ExecuteReaderAsync())
+            using (var connection = new SqlConnection(_connectionString))
             {
-                while (await reader.ReadAsync())
-                {
-                    var gato = new Gato
-                    {
-                        Id_Gato = reader.GetInt32(0),
-                        Id_Protectora = reader.GetInt32(1),
-                        Nombre_Gato = reader.GetString(2),
-                        Raza = reader.GetString(3),
-                        Edad = reader.GetInt32(4),
-                        Esterilizado = reader.GetBoolean(5),
-                        Sexo = reader.GetString(6),
-                        Descripcion_Gato = reader.GetString(7),
-                        Imagen_Gato = reader.GetString(8),
-                        Visible = reader.GetBoolean(9)
-                    };
+                await connection.OpenAsync();
 
-                    gatos.Add(gato);
+                string query = "SELECT * FROM Gato WHERE Id_Protectora = @IdProtectora";
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@IdProtectora", idProtectora);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var gato = new Gato
+                            {
+                                Id_Gato = reader.GetInt32(0),
+                                Id_Protectora = reader.GetInt32(1),
+                                Nombre_Gato = reader.GetString(2),
+                                Raza = reader.GetString(3),
+                                Edad = reader.GetInt32(4),
+                                Esterilizado = reader.GetBoolean(5),
+                                Sexo = reader.GetString(6),
+                                Descripcion_Gato = reader.GetString(7),
+                                Descripcion_Gato_En = reader.GetString(8), // New field for English description
+                                Imagen_Gato = reader.GetString(9),
+                                Visible = reader.GetBoolean(10)
+                            };
+
+                            gatos.Add(gato);
+                        }
+                    }
                 }
             }
+
+            return gatos;
         }
-    }
-
-    return gatos;
-}
-
     }
 }

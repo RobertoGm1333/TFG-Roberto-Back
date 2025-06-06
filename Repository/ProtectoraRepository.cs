@@ -38,7 +38,8 @@ namespace ProtectoraAPI.Repositories
                                 Pagina_Web = reader.GetString(6),
                                 Imagen_Protectora = reader.GetString(7),
                                 Descripcion_Protectora = reader.GetString(8),
-                                Id_Usuario = reader.GetInt32(9)
+                                Descripcion_Protectora_En = reader.IsDBNull(9) ? null : reader.GetString(9), // Added English description field
+                                Id_Usuario = reader.GetInt32(10)
                             };
 
                             protectoras.Add(protectora);
@@ -77,7 +78,8 @@ namespace ProtectoraAPI.Repositories
                                 Pagina_Web = reader.GetString(6),
                                 Imagen_Protectora = reader.GetString(7),
                                 Descripcion_Protectora = reader.GetString(8),
-                                Id_Usuario = reader.GetInt32(9)
+                                Descripcion_Protectora_En = reader.IsDBNull(9) ? null : reader.GetString(9), // Added English description field
+                                Id_Usuario = reader.GetInt32(10)
                             };
                         }
                     }
@@ -93,9 +95,9 @@ namespace ProtectoraAPI.Repositories
                 await connection.OpenAsync();
 
                 string query = @"
-                    INSERT INTO Protectora (Nombre_Protectora, Direccion, Correo_Protectora, Telefono_Protectora, Pagina_Web, Imagen_Protectora, Ubicacion, Descripcion_Protectora, Id_Usuario)
+                    INSERT INTO Protectora (Nombre_Protectora, Direccion, Correo_Protectora, Telefono_Protectora, Pagina_Web, Imagen_Protectora, Ubicacion, Descripcion_Protectora, Descripcion_Protectora_En, Id_Usuario)
                     OUTPUT INSERTED.Id_Protectora
-                    VALUES (@Nombre_Protectora, @Direccion, @Correo_Protectora, @Telefono_Protectora, @Pagina_Web, @Imagen_Protectora, @Ubicacion, @Descripcion_Protectora, @Id_Usuario)";
+                    VALUES (@Nombre_Protectora, @Direccion, @Correo_Protectora, @Telefono_Protectora, @Pagina_Web, @Imagen_Protectora, @Ubicacion, @Descripcion_Protectora, @Descripcion_Protectora_En, @Id_Usuario)";
 
                 using (var command = new SqlCommand(query, connection))
                 {
@@ -107,6 +109,7 @@ namespace ProtectoraAPI.Repositories
                     command.Parameters.AddWithValue("@Imagen_Protectora", protectora.Imagen_Protectora);
                     command.Parameters.AddWithValue("@Ubicacion", protectora.Ubicacion);
                     command.Parameters.AddWithValue("@Descripcion_Protectora", protectora.Descripcion_Protectora);
+                    command.Parameters.AddWithValue("@Descripcion_Protectora_En", protectora.Descripcion_Protectora_En); // Added English description field
                     command.Parameters.AddWithValue("@Id_Usuario", protectora.Id_Usuario);
 
                     var idGenerado = await command.ExecuteScalarAsync();
@@ -124,7 +127,7 @@ namespace ProtectoraAPI.Repositories
             {
                 await connection.OpenAsync();
 
-                string query = "UPDATE Protectora SET Nombre_Protectora = @Nombre_Protectora, Direccion = @Direccion, Correo_Protectora = @Correo_Protectora, Telefono_Protectora = @Telefono_Protectora, Pagina_Web = @Pagina_Web, Imagen_Protectora = @Imagen_Protectora, Ubicacion = @Ubicacion, Descripcion_Protectora = @Descripcion_Protectora, Id_Usuario = @Id_Usuario WHERE Id_Protectora = @Id_Protectora";
+                string query = "UPDATE Protectora SET Nombre_Protectora = @Nombre_Protectora, Direccion = @Direccion, Correo_Protectora = @Correo_Protectora, Telefono_Protectora = @Telefono_Protectora, Pagina_Web = @Pagina_Web, Imagen_Protectora = @Imagen_Protectora, Ubicacion = @Ubicacion, Descripcion_Protectora = @Descripcion_Protectora, Descripcion_Protectora_En = @Descripcion_Protectora_En, Id_Usuario = @Id_Usuario WHERE Id_Protectora = @Id_Protectora";
                 using (var command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id_Protectora", protectora.Id_Protectora);
@@ -136,6 +139,7 @@ namespace ProtectoraAPI.Repositories
                     command.Parameters.AddWithValue("@Imagen_Protectora", protectora.Imagen_Protectora);
                     command.Parameters.AddWithValue("@Ubicacion", protectora.Ubicacion);
                     command.Parameters.AddWithValue("@Descripcion_Protectora", protectora.Descripcion_Protectora);
+                    command.Parameters.AddWithValue("@Descripcion_Protectora_En", protectora.Descripcion_Protectora_En); // Added English description field
                     command.Parameters.AddWithValue("@Id_Usuario", protectora.Id_Usuario);
 
                     await command.ExecuteNonQueryAsync();
@@ -181,7 +185,8 @@ namespace ProtectoraAPI.Repositories
                     Pagina_Web = reader.GetString(6),
                     Imagen_Protectora = reader.GetString(7),
                     Descripcion_Protectora = reader.GetString(8),
-                    Id_Usuario = reader.GetInt32(9)
+                    Descripcion_Protectora_En = reader.IsDBNull(9) ? null : reader.GetString(9), // Added English description field
+                    Id_Usuario = reader.GetInt32(10)
                 };
             }
 

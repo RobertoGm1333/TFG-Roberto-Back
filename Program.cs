@@ -87,12 +87,12 @@ app.UseAuthorization();
 app.UseStaticFiles(); // Para wwwroot
 
 // Configurar el servicio de archivos estáticos para las imágenes del formulario
-app.UseStaticFiles(new StaticFileOptions
+/*app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
         Path.Combine(builder.Environment.ContentRootPath, "Images", "form")),
     RequestPath = "/images"
-});
+});*/
 
 app.MapControllers();
 
